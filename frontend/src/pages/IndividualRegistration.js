@@ -73,7 +73,7 @@ export default function IndividualRegistration() {
     if (!validate()) return;
     // Submit form logic
     try {
-      const response = await fetch('http://localhost:5001/api/register/individual', {
+      const response = await fetch('https://backend-old-smoke-6499.fly.dev/api/register/individual', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

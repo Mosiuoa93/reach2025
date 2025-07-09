@@ -50,7 +50,7 @@ export default function GroupRegistration() {
     setErrors({});
     // Submit to backend
     try {
-      const response = await fetch('http://localhost:5001/api/register/group', {
+      const response = await fetch('https://backend-old-smoke-6499.fly.dev/api/register/group', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ leader, members, accommodation, payment, total, discount }),
