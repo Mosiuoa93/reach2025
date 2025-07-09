@@ -12,9 +12,14 @@ function AdminDashboard() {
 
   useEffect(() => {
     setLoading(true);
+    const token = localStorage.getItem('adminToken');
     Promise.all([
-      fetch('https://backend-old-smoke-6499.fly.dev/api/admin/individuals').then(r => r.json()),
-      fetch('https://backend-old-smoke-6499.fly.dev/api/admin/groups').then(r => r.json())
+      fetch('https://backend-old-smoke-6499.fly.dev/api/admin/individuals', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }).then(r => r.json()),
+      fetch('https://backend-old-smoke-6499.fly.dev/api/admin/groups', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }).then(r => r.json())
     ]).then(([indData, grpData]) => {
       setIndividuals(Array.isArray(indData) ? indData : []);
       setGroups(Array.isArray(grpData) ? grpData : []);
