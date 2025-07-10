@@ -245,6 +245,7 @@ function AdminDashboard() {
                   <TableCell>Name</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Phone</TableCell>
+                  <TableCell>Gender</TableCell>
                   <TableCell>Church</TableCell>
                   <TableCell>Country</TableCell>
                   <TableCell>Accommodation</TableCell>
@@ -258,13 +259,14 @@ function AdminDashboard() {
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.phone}</TableCell>
+                    <TableCell>{(row.gender && row.gender.trim()) ? row.gender : 'N/A'}</TableCell>
                     <TableCell>{row.church}</TableCell>
                     <TableCell>{row.country}</TableCell>
                     <TableCell>{row.accommodation}</TableCell>
                     <TableCell>{row.payment}</TableCell>
                     <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
                   </TableRow>
-                ))}
+                ))} 
               </TableBody>
             </Table>
           </Paper>
@@ -297,7 +299,7 @@ function AdminDashboard() {
                     <TableCell>
                       {Array.isArray(row.members) ? row.members.map((m, idx) => (
                         <div key={idx}>
-                          {m.name} ({m.email}, {m.phone || 'N/A'}, {(m.gender && m.gender.trim()) ? m.gender : 'N/A'})
+                          {m.name} | {m.email} | {m.phone || 'N/A'} | {(m.gender && m.gender.trim()) ? m.gender : 'N/A'}
                         </div>
                       )) : row.members}
                     </TableCell>
