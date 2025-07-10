@@ -21,11 +21,16 @@ function AdminDashboard() {
       fetch('https://backend-old-smoke-6499.fly.dev/api/admin/groups', {
         headers
       }).then(r => r.json())
-    ]).then(([indData, grpData]) => {
-      setIndividuals(Array.isArray(indData) ? indData : []);
-      setGroups(Array.isArray(grpData) ? grpData : []);
-      setLoading(false);
-    });
+    ])
+      .then(([indData, grpData]) => {
+        setIndividuals(Array.isArray(indData) ? indData : []);
+        setGroups(Array.isArray(grpData) ? grpData : []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching admin data:', err);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -88,7 +93,7 @@ function AdminDashboard() {
             }
           }}
           onClick={() => {
-            localStorage.removeItem('admin_token');
+            localStorage.removeItem('adminToken');
             window.location.href = '/admin/login';
           }}
         >
