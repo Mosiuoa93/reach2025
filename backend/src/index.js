@@ -97,6 +97,12 @@ app.post('/api/register/individual', (req, res) => {
 // Group registration endpoint
 app.post('/api/register/group', (req, res) => {
   const data = req.body;
+
+  // Validate that every member has a phone number
+  if (!Array.isArray(data.members) || data.members.some(m => !m.phone || m.phone.trim() === '')) {
+    return res.status(400).json({ success: false, error: 'Each group member must have a phone number.' });
+  }
+
   db.query(
     `INSERT INTO group_registrations 
       (leader_name, leader_email, leader_phone, leader_church, leader_country, accommodation, payment, total, discount, members) 
