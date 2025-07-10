@@ -4,6 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard() {
+  console.log('AdminDashboard loaded');
   const navigate = useNavigate();
   const [tab, setTab] = useState(0);
   const [individuals, setIndividuals] = useState([]);
