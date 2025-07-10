@@ -10,7 +10,7 @@ import AdminLogin from './pages/AdminLogin';
 import Footer from './components/Footer';
 
 function ProtectedAdminRoute() {
-  const token = localStorage.getItem('admin_token');
+  const token = localStorage.getItem('adminToken');
   if (!token) {
     window.location.href = '/admin/login';
     return null;
