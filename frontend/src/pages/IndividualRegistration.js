@@ -147,27 +147,6 @@ export default function IndividualRegistration() {
           label="Country"
           name="country"
           value={form.country}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.country}
-          helperText={errors.country}
-        />
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.email}
-          helperText={errors.email}
-        />
-        <TextField
-          fullWidth
-          label="Phone Number"
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
           margin="normal"
           error={!!errors.phone}
           helperText={errors.phone}
