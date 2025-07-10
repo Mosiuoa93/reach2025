@@ -59,7 +59,13 @@ db.connect()
     console.error('PostgreSQL connection error:', err);
     process.exit(1);
   });
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://www.reach-summit.co.za',
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 app.get('/', (req, res) => {
