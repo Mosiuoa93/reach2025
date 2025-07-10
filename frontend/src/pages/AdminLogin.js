@@ -21,10 +21,10 @@ function AdminLogin() {
       });
       const data = await res.json();
       if (res.ok && data.token) {
-        localStorage.setItem('admin_token', data.token);
-        navigate('/admin');
+        localStorage.setItem('adminToken', data.token);
+        navigate('/admin/dashboard');
       } else {
-        setError(data.error || 'Login failed');
+        setError('Invalid password');
       }
     } catch (err) {
       setError('Network error');
