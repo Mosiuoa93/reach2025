@@ -138,16 +138,6 @@ export default function IndividualRegistration() {
             label="Full Name"
             name="name"
             value={form.name}
-          margin="normal"
-          error={!!errors.church}
-          helperText={errors.church}
-        />
-        <TextField
-          fullWidth
-          label="Country"
-          name="country"
-          value={form.country}
-          margin="normal"
           error={!!errors.phone}
           helperText={errors.phone}
         />
