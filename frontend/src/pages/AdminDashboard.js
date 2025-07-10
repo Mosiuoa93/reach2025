@@ -77,7 +77,7 @@ function AdminDashboard() {
                 localStorage.setItem('adminToken', data.token);
                 setShowLogin(false);
                 setLoginPassword('');
-                setTimeout(() => fetchData(), 200);
+                window.location.reload();
               } else {
                 setLoginError(data.error || 'Login failed');
               }
