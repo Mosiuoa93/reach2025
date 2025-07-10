@@ -10,17 +10,27 @@ function AdminDashboard() {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
+  const fetchData = () => {
     setLoading(true);
     const token = localStorage.getItem('adminToken');
     const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
     Promise.all([
       fetch('https://backend-old-smoke-6499.fly.dev/api/admin/individuals', {
         headers
-      }).then(r => r.json()),
+      }).then(async r => {
+        if (r.status === 401) throw new Error('unauthorized');
+        return r.json();
+      }),
       fetch('https://backend-old-smoke-6499.fly.dev/api/admin/groups', {
         headers
-      }).then(r => r.json())
+      }).then(async r => {
+        if (r.status === 401) throw new Error('unauthorized');
+        return r.json();
+      })
     ])
       .then(([indData, grpData]) => {
         setIndividuals(Array.isArray(indData) ? indData : []);
@@ -28,10 +38,71 @@ function AdminDashboard() {
         setLoading(false);
       })
       .catch(err => {
-        console.error('Error fetching admin data:', err);
+        if (err.message === 'unauthorized') {
+          localStorage.removeItem('adminToken');
+          setShowLogin(true);
+        }
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      setShowLogin(true);
+      setLoading(false);
+      return;
+    }
+    fetchData();
   }, []);
+
+  if (showLogin) {
+    return (
+      <Box sx={{ minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #e3f0ff 0%, #f8e1f4 100%)' }}>
+        <Paper sx={{ p: 4, borderRadius: 4, minWidth: 340, textAlign: 'center' }}>
+          <img src="/logo.png" alt="Multi Ministries Logo" style={{ width: 100, marginBottom: 24 }} />
+          <Typography variant="h5" fontWeight={700} color="primary" gutterBottom>Admin Login</Typography>
+          <form onSubmit={async e => {
+            e.preventDefault();
+            setLoginError('');
+            setLoading(true);
+            try {
+              const res = await fetch('https://backend-old-smoke-6499.fly.dev/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: loginPassword })
+              });
+              const data = await res.json();
+              if (res.ok && data.token) {
+                localStorage.setItem('adminToken', data.token);
+                setShowLogin(false);
+                setLoginPassword('');
+                setTimeout(() => fetchData(), 200);
+              } else {
+                setLoginError(data.error || 'Login failed');
+              }
+            } catch (err) {
+              setLoginError('Network error');
+            }
+            setLoading(false);
+          }}>
+            <input
+              type="password"
+              value={loginPassword}
+              onChange={e => setLoginPassword(e.target.value)}
+              placeholder="Admin Password"
+              style={{ padding: 12, fontSize: 18, width: '100%', marginBottom: 16, borderRadius: 6, border: '1px solid #ccc' }}
+              disabled={loading}
+            />
+            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading || !loginPassword} sx={{ fontWeight: 600, fontSize: 16, borderRadius: 2, py: 1.5 }}>
+              {loading ? 'Logging in...' : 'Login'}
+            </Button>
+            {loginError && <Typography color="error" sx={{ mt: 2 }}>{loginError}</Typography>}
+          </form>
+        </Paper>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -224,7 +295,9 @@ function AdminDashboard() {
                     <TableCell>{row.leader_country}</TableCell>
                     <TableCell>
                       {Array.isArray(row.members) ? row.members.map((m, idx) => (
-                        <div key={idx}>{m.name} ({m.email})</div>
+                        <div key={idx}>
+                          {m.name} ({m.email}{m.phone ? `, ${m.phone}` : ''}{m.gender ? `, ${m.gender}` : ''})
+                        </div>
                       )) : row.members}
                     </TableCell>
                     <TableCell>{row.accommodation}</TableCell>

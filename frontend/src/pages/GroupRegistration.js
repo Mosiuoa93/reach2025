@@ -3,7 +3,7 @@ import { Typography, TextField, Button, IconButton, Paper, Grid, Box, FormContro
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
-const initialMember = { name: '', gender: '', email: '' };
+const initialMember = { name: '', gender: '', email: '', phone: '' };
 
 export default function GroupRegistration() {
   const navigate = useNavigate();
@@ -131,23 +131,22 @@ export default function GroupRegistration() {
           <Typography variant="h6">Group Members</Typography>
           {errors.members && <Typography color="error">{errors.members}</Typography>}
           {members.map((member, idx) => (
-            <Grid container spacing={2} key={idx} alignItems="center">
-              <Grid item xs={4}><TextField label="Name" name="name" value={member.name} onChange={e => handleMemberChange(idx, e)} fullWidth required /></Grid>
-              <Grid item xs={4}>
-                <FormControl fullWidth required>
-                  <FormLabel>Gender</FormLabel>
-                  <RadioGroup row name="gender" value={member.gender} onChange={e => handleMemberChange(idx, e)}>
-                    <FormControlLabel value="Male" control={<Radio />} label="Male" />
-                    <FormControlLabel value="Female" control={<Radio />} label="Female" />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={4}><TextField label="Email" name="email" value={member.email} onChange={e => handleMemberChange(idx, e)} fullWidth required /></Grid>
-              <Grid item xs={2}>
-                <Button onClick={() => removeMember(idx)} color="error" disabled={members.length === 1}>Remove</Button>
-              </Grid>
-            </Grid>
-          ))}
+  <Box key={idx} sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2, mb: 2 }}>
+    <TextField label="Name" name="name" value={member.name} onChange={e => handleMemberChange(idx, e)} fullWidth required sx={{ mb: 2 }} />
+    <TextField label="Email" name="email" value={member.email} onChange={e => handleMemberChange(idx, e)} fullWidth required sx={{ mb: 2 }} />
+    <TextField label="Phone Number" name="phone" value={member.phone} onChange={e => handleMemberChange(idx, e)} fullWidth required sx={{ mb: 2 }} />
+    <FormControl component="fieldset" margin="normal" required sx={{ mb: 2 }}>
+      <FormLabel component="legend">Gender</FormLabel>
+      <RadioGroup row name="gender" value={member.gender} onChange={e => handleMemberChange(idx, e)}>
+        <FormControlLabel value="Male" control={<Radio />} label="Male" />
+        <FormControlLabel value="Female" control={<Radio />} label="Female" />
+      </RadioGroup>
+    </FormControl>
+    <Button onClick={() => removeMember(idx)} color="error" disabled={members.length === 1} sx={{ mt: 1 }}>
+      Remove
+    </Button>
+  </Box>
+))}
           <Button onClick={addMember} style={{ marginTop: 8 }} variant="outlined">Add Member</Button>
         </Paper>
         <Paper sx={{ p: 2, mb: 2 }}>

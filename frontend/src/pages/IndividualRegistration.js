@@ -133,128 +133,178 @@ export default function IndividualRegistration() {
           Individual Registration
         </Typography>
         <form onSubmit={handleSubmit} style={{ marginTop: 16, textAlign: 'left' }}>
-          <TextField
-            fullWidth
-            label="Full Name"
-            name="name"
-            value={form.name}
-          error={!!errors.phone}
-          helperText={errors.phone}
-        />
-        <TextField
-          fullWidth
-          label="Emergency Contact Name"
-          name="emergencyName"
-          value={form.emergencyName}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.emergencyName}
-          helperText={errors.emergencyName}
-        />
-        <TextField
-          fullWidth
-          label="Emergency Contact Number"
-          name="emergencyContact"
-          value={form.emergencyContact}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.emergencyContact}
-          helperText={errors.emergencyContact}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={form.indemnity} name="indemnity" onChange={handleChange} />}
-          label="I accept the indemnity agreement (required)"
-        />
-        {errors.indemnity && <FormHelperText error>{errors.indemnity}</FormHelperText>}
-        <FormControl component="fieldset" margin="normal" error={!!errors.accommodation}>
-          <FormLabel component="legend">Accommodation Option</FormLabel>
-          <RadioGroup
-            row
-            name="accommodation"
-            value={form.accommodation}
-            onChange={handleChange}
-          >
-            <FormControlLabel value="dorm" control={<Radio />} label="Dormitory" />
-            <FormControlLabel value="daypass" control={<Radio />} label="Day Pass" />
-          </RadioGroup>
-          <FormHelperText>{errors.accommodation}</FormHelperText>
-        </FormControl>
-        {form.accommodation === 'dorm' && (
-          <>
-            <Typography color="secondary" style={{ marginBottom: 8 }}>
-              Dormitory: <b>R1300-00</b> total
-            </Typography>
-            <FormControlLabel
-              control={<Checkbox checked={form.bedding} name="bedding" onChange={handleChange} />}
-              label="I will bring my own bedding (required)"
-            />
-          </>
-        )}
-        {form.accommodation === 'dorm' && errors.bedding && <FormHelperText error>{errors.bedding}</FormHelperText>}
-        {form.accommodation === 'daypass' && (
-          <FormControl component="fieldset" margin="normal" error={!!errors.dayPass}>
-            <FormLabel component="legend">Select Day(s) <span style={{ color: '#1976d2' }}>(R250-00 per day)</span></FormLabel>
-            <FormGroup row>
-              {days.map((d) => (
-                <FormControlLabel
-                  key={d.value}
-                  control={
-                    <Checkbox
-                      checked={form.dayPass.includes(d.value)}
-                      onChange={handleDayChange}
-                      value={d.value}
-                    />
-                  }
-                  label={d.label}
-                />
-              ))}
-            </FormGroup>
-            <FormHelperText>{errors.dayPass}</FormHelperText>
-          </FormControl>
-        )}
-        <FormControl component="fieldset" margin="normal" error={!!errors.payment}>
-          <FormLabel component="legend">Payment Option</FormLabel>
-          <RadioGroup
-            row
-            name="payment"
-            value={form.payment}
-            onChange={handleChange}
-          >
-            <FormControlLabel value="now" control={<Radio />} label="Pay Now" />
-            <FormControlLabel value="venue" control={<Radio />} label="Pay at Venue" />
-          </RadioGroup>
-          <FormHelperText>{errors.payment}</FormHelperText>
-        </FormControl>
-        {form.payment === 'venue' && (
+  <TextField
+    fullWidth
+    label="Full Name"
+    name="name"
+    value={form.name}
+    onChange={handleChange}
+    margin="normal"
+    error={!!errors.name}
+    helperText={errors.name}
+  />
+  <FormControl component="fieldset" margin="normal" required error={!!errors.gender}>
+    <FormLabel component="legend">Gender</FormLabel>
+    <RadioGroup row name="gender" value={form.gender} onChange={handleChange}>
+      <FormControlLabel value="Male" control={<Radio />} label="Male" />
+      <FormControlLabel value="Female" control={<Radio />} label="Female" />
+    </RadioGroup>
+    <FormHelperText>{errors.gender}</FormHelperText>
+  </FormControl>
+  <TextField
+    fullWidth
+    label="Email"
+    name="email"
+    value={form.email}
+    onChange={handleChange}
+    margin="normal"
+    error={!!errors.email}
+    helperText={errors.email}
+  />
+  <TextField
+    fullWidth
+    label="Phone Number"
+    name="phone"
+    value={form.phone}
+    onChange={handleChange}
+    margin="normal"
+    error={!!errors.phone}
+    helperText={errors.phone}
+  />
+  <TextField
+    fullWidth
+    label="Church/Organization"
+    name="church"
+    value={form.church}
+    onChange={handleChange}
+    margin="normal"
+    error={!!errors.church}
+    helperText={errors.church}
+  />
+  <TextField
+    fullWidth
+    label="Country"
+    name="country"
+    value={form.country}
+    onChange={handleChange}
+    margin="normal"
+    error={!!errors.country}
+    helperText={errors.country}
+  />
+  <TextField
+    fullWidth
+    label="Emergency Contact Name"
+    name="emergencyName"
+    value={form.emergencyName}
+    onChange={handleChange}
+    margin="normal"
+    error={!!errors.emergencyName}
+    helperText={errors.emergencyName}
+  />
+  <TextField
+    fullWidth
+    label="Emergency Contact Number"
+    name="emergencyContact"
+    value={form.emergencyContact}
+    onChange={handleChange}
+    margin="normal"
+    error={!!errors.emergencyContact}
+    helperText={errors.emergencyContact}
+  />
           <FormControlLabel
-            control={<Checkbox checked={form.commitment} name="commitment" onChange={handleChange} />}
-            label="I commit to attend (required)"
+            control={<Checkbox checked={form.indemnity} name="indemnity" onChange={handleChange} />}
+            label="I accept the indemnity agreement (required)"
           />
-        )}
-        {form.payment === 'venue' && errors.commitment && <FormHelperText error>{errors.commitment}</FormHelperText>}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{
-            mt: 3,
-            fontWeight: 600,
-            borderRadius: 8,
-            fontSize: 18,
-            padding: '14px 0',
-            transition: 'all 0.2s',
-            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.13)',
-            '&:hover, &:focus': {
-              background: 'linear-gradient(90deg, #1976d2 60%, #9c27b0 100%)',
-              color: '#fff',
-              boxShadow: '0 6px 18px rgba(76, 0, 130, 0.13)'
-            }
-          }}
-        >
-          Submit Registration
-        </Button>
-      </form>
+          {errors.indemnity && <FormHelperText error>{errors.indemnity}</FormHelperText>}
+          <FormControl component="fieldset" margin="normal" error={!!errors.accommodation}>
+            <FormLabel component="legend">Accommodation Option</FormLabel>
+            <RadioGroup
+              row
+              name="accommodation"
+              value={form.accommodation}
+              onChange={handleChange}
+            >
+              <FormControlLabel value="dorm" control={<Radio />} label="Dormitory" />
+              <FormControlLabel value="daypass" control={<Radio />} label="Day Pass" />
+            </RadioGroup>
+            <FormHelperText>{errors.accommodation}</FormHelperText>
+          </FormControl>
+          {form.accommodation === 'dorm' && (
+            <>
+              <Typography color="secondary" style={{ marginBottom: 8 }}>
+                Dormitory: <b>R1300-00</b> total
+              </Typography>
+              <FormControlLabel
+                control={<Checkbox checked={form.bedding} name="bedding" onChange={handleChange} />}
+                label="I will bring my own bedding (required)"
+              />
+              {errors.bedding && <FormHelperText error>{errors.bedding}</FormHelperText>}
+            </>
+          )}
+          {form.accommodation === 'daypass' && (
+            <FormControl component="fieldset" margin="normal" error={!!errors.dayPass}>
+              <FormLabel component="legend">Select Day(s) <span style={{ color: '#1976d2' }}>(R250-00 per day)</span></FormLabel>
+              <FormGroup row>
+                {days.map((d) => (
+                  <FormControlLabel
+                    key={d.value}
+                    control={
+                      <Checkbox
+                        checked={form.dayPass.includes(d.value)}
+                        onChange={handleDayChange}
+                        value={d.value}
+                      />
+                    }
+                    label={d.label}
+                  />
+                ))}
+              </FormGroup>
+              <FormHelperText>{errors.dayPass}</FormHelperText>
+            </FormControl>
+          )}
+          <FormControl component="fieldset" margin="normal" error={!!errors.payment}>
+            <FormLabel component="legend">Payment Option</FormLabel>
+            <RadioGroup
+              row
+              name="payment"
+              value={form.payment}
+              onChange={handleChange}
+            >
+              <FormControlLabel value="online" control={<Radio />} label="Online Payment" />
+              <FormControlLabel value="venue" control={<Radio />} label="Payment at the Venue" />
+            </RadioGroup>
+            <FormHelperText>{errors.payment}</FormHelperText>
+            {form.payment === 'venue' && (
+              <FormControlLabel
+                control={<Checkbox checked={form.commitment} name="commitment" onChange={handleChange} />}
+                label="I commit to attend (required)"
+              />
+            )}
+            {form.payment === 'venue' && errors.commitment && <FormHelperText error>{errors.commitment}</FormHelperText>}
+          </FormControl>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{
+              mt: 3,
+              fontWeight: 600,
+              borderRadius: 8,
+              fontSize: 18,
+              padding: '14px 0',
+              transition: 'all 0.2s',
+              boxShadow: '0 2px 8px rgba(25, 118, 210, 0.13)',
+              '&:hover, &:focus': {
+                background: 'linear-gradient(90deg, #1976d2 60%, #9c27b0 100%)',
+                color: '#fff',
+                boxShadow: '0 6px 18px rgba(76, 0, 130, 0.13)'
+              }
+            }}
+          >
+            Submit Registration
+          </Button>
+        </form>
       </Paper>
       <style>{`
         @keyframes fadeIn {
