@@ -297,7 +297,7 @@ function AdminDashboard() {
                     <TableCell>
                       {Array.isArray(row.members) ? row.members.map((m, idx) => (
                         <div key={idx}>
-                          {m.name} ({m.email}{m.phone ? `, ${m.phone}` : ''}{m.gender ? `, ${m.gender}` : ''})
+                          {m.name} ({m.email}, {m.phone || 'N/A'}, {(m.gender && m.gender.trim()) ? m.gender : 'N/A'})
                         </div>
                       )) : row.members}
                     </TableCell>
