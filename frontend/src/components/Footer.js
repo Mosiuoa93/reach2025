@@ -19,7 +19,7 @@ export default function Footer() {
       zIndex: 2
     }}>
       <Typography variant="body2" sx={{ fontWeight: 400 }}>
-        &copy; {new Date().getFullYear()} Multi Ministries. All rights reserved. | Contact: info@multiministries.co.za
+        &copy; {new Date().getFullYear()} Multi Ministries. All rights reserved. | Contact: office@multiministries.co.za
       </Typography>
       <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 1 }}>
         <IconButton

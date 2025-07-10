@@ -3,11 +3,11 @@ import { Typography, TextField, Button, IconButton, Paper, Grid, Box } from '@mu
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
-const initialMember = { name: '', email: '' };
+const initialMember = { name: '', gender: '', email: '' };
 
 export default function GroupRegistration() {
   const navigate = useNavigate();
-  const [leader, setLeader] = useState({ name: '', email: '', phone: '', church: '', country: '' });
+  const [leader, setLeader] = useState({ name: '', gender: '', email: '', phone: '', church: '', country: '' });
   const [members, setMembers] = useState([{ ...initialMember }]);
   const [accommodation, setAccommodation] = useState('dorm');
   const [payment, setPayment] = useState('paynow');
@@ -112,6 +112,15 @@ export default function GroupRegistration() {
           <Typography variant="h6">Group Leader Information</Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}><TextField label="Full Name" name="name" value={leader.name} onChange={handleLeaderChange} fullWidth required /></Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth required>
+                <FormLabel>Gender</FormLabel>
+                <RadioGroup row name="gender" value={leader.gender} onChange={handleLeaderChange}>
+                  <FormControlLabel value="Male" control={<Radio />} label="Male" />
+                  <FormControlLabel value="Female" control={<Radio />} label="Female" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
             <Grid item xs={12} sm={6}><TextField label="Email" name="email" value={leader.email} onChange={handleLeaderChange} fullWidth required /></Grid>
             <Grid item xs={12} sm={6}><TextField label="Phone" name="phone" value={leader.phone} onChange={handleLeaderChange} fullWidth /></Grid>
             <Grid item xs={12} sm={6}><TextField label="Church/Organization" name="church" value={leader.church} onChange={handleLeaderChange} fullWidth /></Grid>
@@ -123,8 +132,17 @@ export default function GroupRegistration() {
           {errors.members && <Typography color="error">{errors.members}</Typography>}
           {members.map((member, idx) => (
             <Grid container spacing={2} key={idx} alignItems="center">
-              <Grid item xs={5}><TextField label="Name" name="name" value={member.name} onChange={e => handleMemberChange(idx, e)} fullWidth required /></Grid>
-              <Grid item xs={5}><TextField label="Email" name="email" value={member.email} onChange={e => handleMemberChange(idx, e)} fullWidth required /></Grid>
+              <Grid item xs={4}><TextField label="Name" name="name" value={member.name} onChange={e => handleMemberChange(idx, e)} fullWidth required /></Grid>
+              <Grid item xs={4}>
+                <FormControl fullWidth required>
+                  <FormLabel>Gender</FormLabel>
+                  <RadioGroup row name="gender" value={member.gender} onChange={e => handleMemberChange(idx, e)}>
+                    <FormControlLabel value="Male" control={<Radio />} label="Male" />
+                    <FormControlLabel value="Female" control={<Radio />} label="Female" />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}><TextField label="Email" name="email" value={member.email} onChange={e => handleMemberChange(idx, e)} fullWidth required /></Grid>
               <Grid item xs={2}>
                 <Button onClick={() => removeMember(idx)} color="error" disabled={members.length === 1}>Remove</Button>
               </Grid>

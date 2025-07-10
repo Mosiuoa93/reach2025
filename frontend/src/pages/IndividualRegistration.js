@@ -14,6 +14,7 @@ export default function IndividualRegistration() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
+    gender: '',
     email: '',
     phone: '',
     church: '',
@@ -52,6 +53,7 @@ export default function IndividualRegistration() {
   const validate = () => {
     let newErrors = {};
     if (!form.name) newErrors.name = 'Required';
+    if (!form.gender) newErrors.gender = 'Required';
     if (!form.email) newErrors.email = 'Required';
     if (!form.phone) newErrors.phone = 'Required';
     if (!form.church) newErrors.church = 'Required';
@@ -131,22 +133,11 @@ export default function IndividualRegistration() {
           Individual Registration
         </Typography>
         <form onSubmit={handleSubmit} style={{ marginTop: 16, textAlign: 'left' }}>
-        <TextField
-          fullWidth
-          label="Full Name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.name}
-          helperText={errors.name}
-        />
-        <TextField
-          fullWidth
-          label="Church/Organization"
-          name="church"
-          value={form.church}
-          onChange={handleChange}
+          <TextField
+            fullWidth
+            label="Full Name"
+            name="name"
+            value={form.name}
           margin="normal"
           error={!!errors.church}
           helperText={errors.church}
