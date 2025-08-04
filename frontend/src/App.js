@@ -8,7 +8,14 @@ import ConfirmationPage from './pages/ConfirmationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import Footer from './components/Footer';
-import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+function ProtectedAdminRoute() {
+  const token = localStorage.getItem('adminToken');
+  if (!token) {
+    window.location.href = '/admin/login';
+    return null;
+  }
+  return <AdminDashboard />;
+}
 
 function App() {
   return (
