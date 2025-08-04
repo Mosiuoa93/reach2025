@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Tabs, Tab, IconButton, Button, Box } from '@mui/material';
+import { Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Tabs, Tab, IconButton, Button, Box, Grid } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,10 +10,43 @@ function AdminDashboard() {
   const [individuals, setIndividuals] = useState([]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statistics, setStatistics] = useState({
+    gender: { male: 0, female: 0 },
+    dayVisit: 0,
+    dorm: 0
+  });
 
   const [showLogin, setShowLogin] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+
+  const calculateStatistics = () => {
+    const stats = {
+      gender: { male: 0, female: 0 },
+      dayVisit: 0,
+      dorm: 0
+    };
+
+    // Count from individual registrations
+    individuals.forEach(ind => {
+      if (ind.gender === 'Male') stats.gender.male++;
+      if (ind.gender === 'Female') stats.gender.female++;
+      if (ind.accommodation === 'daypass') stats.dayVisit++;
+      if (ind.accommodation === 'dorm') stats.dorm++;
+    });
+
+    // Count from group registrations
+    groups.forEach(group => {
+      group.members.forEach(member => {
+        if (member.gender === 'Male') stats.gender.male++;
+        if (member.gender === 'Female') stats.gender.female++;
+      });
+      if (group.accommodation === 'daypass') stats.dayVisit += group.members.length;
+      if (group.accommodation === 'dorm') stats.dorm += group.members.length;
+    });
+
+    setStatistics(stats);
+  };
 
   const fetchData = () => {
     setLoading(true);
@@ -37,6 +70,7 @@ function AdminDashboard() {
         setIndividuals(Array.isArray(indData) ? indData : []);
         setGroups(Array.isArray(grpData) ? grpData : []);
         setLoading(false);
+        calculateStatistics();
       })
       .catch(err => {
         if (err.message === 'unauthorized') {
@@ -176,9 +210,10 @@ function AdminDashboard() {
           Admin Dashboard
         </Typography>
         <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ flex: 1 }}>
-            <Tab label="Individual Registrations" />
-            <Tab label="Group Registrations" />
+          <Tabs value={tab} onChange={(e, newValue) => setTab(newValue)}>
+            <Tab label={`Individuals (${individuals.length})`} />
+            <Tab label={`Groups (${groups.length})`} />
+            <Tab label={`Statistics`} />
           </Tabs>
           <Button
             variant="outlined"
@@ -266,26 +301,25 @@ function AdminDashboard() {
                     <TableCell>{row.payment}</TableCell>
                     <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
                   </TableRow>
-                ))} 
-              </TableBody>
-            </Table>
-          </Paper>
-        ) : (
-          <Paper>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Leader Name</TableCell>
-                  <TableCell>Leader Email</TableCell>
-                  <TableCell>Leader Phone</TableCell>
-                  <TableCell>Church</TableCell>
+                </TableHead>
+                <TableBody>
+                  {individuals.map((row, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{row.name}</TableCell>
+                      <TableCell>{row.email}</TableCell>
+                      <TableCell>{row.phone}</TableCell>
+                      <TableCell>{(row.gender && row.gender.trim()) ? row.gender : 'N/A'}</TableCell>
+                      <TableCell>{row.church}</TableCell>
+                      <TableCell>{row.country}</TableCell>
+                      <TableCell>{row.accommodation}</TableCell>
+                      <TableCell>{row.payment}</TableCell>
                   <TableCell>Country</TableCell>
-                  <TableCell>Members</TableCell>
                   <TableCell>Accommodation</TableCell>
                   <TableCell>Payment</TableCell>
                   <TableCell>Total</TableCell>
                   <TableCell>Discount</TableCell>
-                  <TableCell>Date</TableCell>
+                  <TableCell>Created At</TableCell>
+                  <TableCell>Members</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -313,8 +347,40 @@ function AdminDashboard() {
               </TableBody>
             </Table>
           </Paper>
-        )
-      )}
+        ) : (
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h5" gutterBottom>Registration Statistics</Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={4}>
+                <Paper sx={{ p: 2, textAlign: 'center' }}>
+                  <Typography variant="h6" gutterBottom>Gender Distribution</Typography>
+                  <Typography variant="h4" color="primary" gutterBottom>
+                    {statistics.gender.male} Male / {statistics.gender.female} Female
+                  </Typography>
+                  <Typography variant="body2">
+                    Total: {statistics.gender.male + statistics.gender.female}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Paper sx={{ p: 2, textAlign: 'center' }}>
+                  <Typography variant="h6" gutterBottom>Day Visit Registrations</Typography>
+                  <Typography variant="h4" color="primary" gutterBottom>
+                    {statistics.dayVisit}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Paper sx={{ p: 2, textAlign: 'center' }}>
+                  <Typography variant="h6" gutterBottom>Dorm Registrations</Typography>
+                  <Typography variant="h4" color="primary" gutterBottom>
+                    {statistics.dorm}
+                  </Typography>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
       </Paper>
       <style>{`
         @keyframes fadeIn {
