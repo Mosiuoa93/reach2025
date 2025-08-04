@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Tabs, Tab, IconButton, Button, Box, Grid } from '@mui/material';
+import { Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, CircularProgress, Tabs, Tab, IconButton, Button, Box, Grid } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
@@ -271,123 +271,127 @@ function AdminDashboard() {
             Export CSV
           </Button>
         </Box>
-      {loading ? <CircularProgress /> : (
-        tab === 0 ? (
-          <Paper>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Gender</TableCell>
-                  <TableCell>Church</TableCell>
-                  <TableCell>Country</TableCell>
-                  <TableCell>Accommodation</TableCell>
-                  <TableCell>Payment</TableCell>
-                  <TableCell>Date</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {individuals.map((row, i) => (
-                  <TableRow key={i}>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.email}</TableCell>
-                    <TableCell>{row.phone}</TableCell>
-                    <TableCell>{(row.gender && row.gender.trim()) ? row.gender : 'N/A'}</TableCell>
-                    <TableCell>{row.church}</TableCell>
-                    <TableCell>{row.country}</TableCell>
-                    <TableCell>{row.accommodation}</TableCell>
-                    <TableCell>{row.payment}</TableCell>
-                    <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {individuals.map((row, i) => (
-                    <TableRow key={i}>
-                      <TableCell>{row.name}</TableCell>
-                      <TableCell>{row.email}</TableCell>
-                      <TableCell>{row.phone}</TableCell>
-                      <TableCell>{(row.gender && row.gender.trim()) ? row.gender : 'N/A'}</TableCell>
-                      <TableCell>{row.church}</TableCell>
-                      <TableCell>{row.country}</TableCell>
-                      <TableCell>{row.accommodation}</TableCell>
-                      <TableCell>{row.payment}</TableCell>
-                  <TableCell>Country</TableCell>
-                  <TableCell>Accommodation</TableCell>
-                  <TableCell>Payment</TableCell>
-                  <TableCell>Total</TableCell>
-                  <TableCell>Discount</TableCell>
-                  <TableCell>Created At</TableCell>
-                  <TableCell>Members</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {groups.map((row, i) => (
-                  <TableRow key={i}>
-                    <TableCell>{row.leader_name}</TableCell>
-                    <TableCell>{row.leader_email}</TableCell>
-                    <TableCell>{row.leader_phone}</TableCell>
-                    <TableCell>{row.leader_church}</TableCell>
-                    <TableCell>{row.leader_country}</TableCell>
-                    <TableCell>
-                      {Array.isArray(row.members) ? row.members.map((m, idx) => (
-                        <div key={idx}>
-                          {m.name} | {m.email} | {m.phone || 'N/A'} | {(m.gender && m.gender.trim()) ? m.gender : 'N/A'}
-                        </div>
-                      )) : row.members}
-                    </TableCell>
-                    <TableCell>{row.accommodation}</TableCell>
-                    <TableCell>{row.payment}</TableCell>
-                    <TableCell>{row.total}</TableCell>
-                    <TableCell>{row.discount}</TableCell>
-                    <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Paper>
-        ) : (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom>Registration Statistics</Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={4}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <Typography variant="h6" gutterBottom>Gender Distribution</Typography>
-                  <Typography variant="h4" color="primary" gutterBottom>
-                    {statistics.gender.male} Male / {statistics.gender.female} Female
-                  </Typography>
-                  <Typography variant="body2">
-                    Total: {statistics.gender.male + statistics.gender.female}
-                  </Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <Typography variant="h6" gutterBottom>Day Visit Registrations</Typography>
-                  <Typography variant="h4" color="primary" gutterBottom>
-                    {statistics.dayVisit}
-                  </Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <Typography variant="h6" gutterBottom>Dorm Registrations</Typography>
-                  <Typography variant="h4" color="primary" gutterBottom>
-                    {statistics.dorm}
-                  </Typography>
-                </Paper>
-              </Grid>
-            </Grid>
-          </Box>
-        )}
+        <Box>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Paper>
+              {tab === 0 ? (
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Phone</TableCell>
+                        <TableCell>Church</TableCell>
+                        <TableCell>Country</TableCell>
+                        <TableCell>Emergency Contact</TableCell>
+                        <TableCell>Indemnity</TableCell>
+                        <TableCell>Accommodation</TableCell>
+                        <TableCell>Payment</TableCell>
+                        <TableCell>Registration Date</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {individuals.map((row, i) => (
+                        <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                          <TableCell component="th" scope="row">{row.name}</TableCell>
+                          <TableCell>{row.email}</TableCell>
+                          <TableCell>{row.phone}</TableCell>
+                          <TableCell>{row.church}</TableCell>
+                          <TableCell>{row.country}</TableCell>
+                          <TableCell>{row.emergencyContact}</TableCell>
+                          <TableCell>{row.indemnity ? 'Yes' : 'No'}</TableCell>
+                          <TableCell>{row.accommodation}</TableCell>
+                          <TableCell>{row.payment}</TableCell>
+                          <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : tab === 1 ? (
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Leader Name</TableCell>
+                        <TableCell>Leader Email</TableCell>
+                        <TableCell>Leader Phone</TableCell>
+                        <TableCell>Leader Church</TableCell>
+                        <TableCell>Leader Country</TableCell>
+                        <TableCell>Accommodation</TableCell>
+                        <TableCell>Payment</TableCell>
+                        <TableCell>Total</TableCell>
+                        <TableCell>Discount</TableCell>
+                        <TableCell>Created At</TableCell>
+                        <TableCell>Members</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {groups.map((row, i) => (
+                        <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                          <TableCell component="th" scope="row">{row.leader_name}</TableCell>
+                          <TableCell>{row.leader_email}</TableCell>
+                          <TableCell>{row.leader_phone}</TableCell>
+                          <TableCell>{row.leader_church}</TableCell>
+                          <TableCell>{row.leader_country}</TableCell>
+                          <TableCell>{row.accommodation}</TableCell>
+                          <TableCell>{row.payment}</TableCell>
+                          <TableCell>{row.total}</TableCell>
+                          <TableCell>{row.discount}</TableCell>
+                          <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
+                          <TableCell>
+                            {Array.isArray(row.members) ? row.members.map((m, idx) => (
+                              <div key={idx}>
+                                {m.name} | {m.email} | {m.phone || 'N/A'} | {(m.gender && m.gender.trim()) ? m.gender : 'N/A'}
+                              </div>
+                            )) : row.members}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Box sx={{ p: 3 }}>
+                  <Typography variant="h5" gutterBottom>Registration Statistics</Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={4}>
+                      <Paper sx={{ p: 2, textAlign: 'center' }}>
+                        <Typography variant="h6" gutterBottom>Gender Distribution</Typography>
+                        <Typography variant="h4" color="primary" gutterBottom>
+                          {statistics.gender.male} Male / {statistics.gender.female} Female
+                        </Typography>
+                        <Typography variant="body2">
+                          Total: {statistics.gender.male + statistics.gender.female}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Paper sx={{ p: 2, textAlign: 'center' }}>
+                        <Typography variant="h6" gutterBottom>Day Visit Registrations</Typography>
+                        <Typography variant="h4" color="primary" gutterBottom>
+                          {statistics.dayVisit}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Paper sx={{ p: 2, textAlign: 'center' }}>
+                        <Typography variant="h6" gutterBottom>Dorm Registrations</Typography>
+                        <Typography variant="h4" color="primary" gutterBottom>
+                          {statistics.dorm}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+            </Paper>
+          )}
+        </Box>
       </Paper>
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(40px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </Box>
   );
 }

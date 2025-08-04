@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "builds": [
+    {
+      "src": "build/index.html",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://backend-old-smoke-6499.fly.dev",
+    "REACT_APP_SUPABASE_URL": "${REACT_APP_SUPABASE_URL}",
+    "REACT_APP_SUPABASE_ANON_KEY": "${REACT_APP_SUPABASE_ANON_KEY}"
+  }
+}
