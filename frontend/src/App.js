@@ -8,15 +8,7 @@ import ConfirmationPage from './pages/ConfirmationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import Footer from './components/Footer';
-
-function ProtectedAdminRoute() {
-  const token = localStorage.getItem('adminToken');
-  if (!token) {
-    window.location.href = '/admin/login';
-    return null;
-  }
-  return <AdminDashboard />;
-}
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 function App() {
   return (
@@ -27,8 +19,8 @@ function App() {
         <Route path="/register/individual" element={<IndividualRegistration />} />
         <Route path="/register/group" element={<GroupRegistration />} />
         <Route path="/register/confirmation" element={<ConfirmationPage />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin" element={<ProtectedAdminRoute />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<ProtectedAdminRoute />} />
       </Routes>
       <Footer />
     </Router>

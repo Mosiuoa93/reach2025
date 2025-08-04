@@ -14,7 +14,7 @@ function AdminLogin() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('https://backend-old-smoke-6499.fly.dev/api/admin/login', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
