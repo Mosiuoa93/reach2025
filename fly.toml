@@ -1,0 +1,23 @@
+# fly.toml app configuration file generated for reach2025-backend on 2025-08-05T12:40:29+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'reach2025-backend'
+primary_region = 'jnb'
+
+[build]
+  dockerfile = 'backend/Dockerfile'
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

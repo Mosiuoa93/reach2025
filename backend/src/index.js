@@ -1,64 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { Pool } = require('pg');
-const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
+const supabase = require('./config/supabase');
 
 const app = express();
 
-// PostgreSQL connection
-const db = new Pool({
-  host: process.env.PGHOST || 'localhost',
-  user: process.env.PGUSER || 'postgres',
-  password: process.env.PGPASSWORD || '',
-  database: process.env.PGDATABASE || 'reach2025',
-  port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
-});
-
-db.connect()
-  .then(() => {
-    console.log('Connected to PostgreSQL');
-    // Create tables if not exist (Postgres syntax)
-    db.query(`
-      CREATE TABLE IF NOT EXISTS individual_registrations (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100),
-        email VARCHAR(100),
-        phone VARCHAR(50),
-        church VARCHAR(100),
-        country VARCHAR(100),
-        emergencyName VARCHAR(100),
-        emergencyContact VARCHAR(100),
-        indemnity BOOLEAN,
-        accommodation VARCHAR(20),
-        bedding BOOLEAN,
-        dayPass TEXT,
-        payment VARCHAR(20),
-        commitment VARCHAR(100),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS group_registrations (
-        id SERIAL PRIMARY KEY,
-        leader_name VARCHAR(100),
-        leader_email VARCHAR(100),
-        leader_phone VARCHAR(50),
-        leader_church VARCHAR(100),
-        leader_country VARCHAR(100),
-        accommodation VARCHAR(20),
-        payment VARCHAR(20),
-        total DECIMAL(10,2),
-        discount DECIMAL(10,2),
-        members TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `)
-      .catch(err => console.error('Error creating tables:', err));
-  })
-  .catch(err => {
-    console.error('PostgreSQL connection error:', err);
-    process.exit(1);
-  });
 app.use(cors({
   origin: [
     'https://www.reach-summit.co.za',
@@ -67,35 +16,41 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.status(200).type('text').send('REACH2025 Backend API is running.');
-});
+app.use(helmet());
+app.use(morgan('combined'));
 
 // Individual registration endpoint
-app.post('/api/register/individual', (req, res) => {
+app.post('/api/register/individual', async (req, res) => {
   const data = req.body;
-  db.query(
-    `INSERT INTO individual_registrations 
-      (name, email, phone, church, country, emergencyName, emergencyContact, indemnity, accommodation, bedding, dayPass, payment, commitment) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-    [
-      data.name, data.email, data.phone, data.church, data.country,
-      data.emergencyName, data.emergencyContact, data.indemnity,
-      data.accommodation, data.bedding,
-      JSON.stringify(data.dayPass || []),
-      data.payment, data.commitment
-    ]
-  )
-    .then(() => res.json({ success: true }))
-    .catch(err => {
-      console.error('Error saving individual registration:', err);
-      res.status(500).json({ success: false, error: 'DB error' });
-    });
+  try {
+    const { error } = await supabase
+      .from('individual_registrations')
+      .insert({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        church: data.church,
+        country: data.country,
+        emergencyName: data.emergencyName,
+        emergencyContact: data.emergencyContact,
+        indemnity: data.indemnity,
+        accommodation: data.accommodation,
+        bedding: data.bedding,
+        dayPass: data.dayPass || [],
+        payment: data.payment,
+        commitment: data.commitment
+      });
+
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error saving individual registration:', err);
+    res.status(500).json({ success: false, error: 'DB error' });
+  }
 });
 
 // Group registration endpoint
-app.post('/api/register/group', (req, res) => {
+app.post('/api/register/group', async (req, res) => {
   const data = req.body;
 
   // Validate that every member has a phone number
@@ -103,21 +58,28 @@ app.post('/api/register/group', (req, res) => {
     return res.status(400).json({ success: false, error: 'Each group member must have a phone number.' });
   }
 
-  db.query(
-    `INSERT INTO group_registrations 
-      (leader_name, leader_email, leader_phone, leader_church, leader_country, accommodation, payment, total, discount, members) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)` ,
-    [
-      data.leader.name, data.leader.email, data.leader.phone, data.leader.church, data.leader.country,
-      data.accommodation, data.payment, data.total, data.discount,
-      JSON.stringify(data.members)
-    ]
-  )
-    .then(() => res.json({ success: true }))
-    .catch(err => {
-      console.error('Error saving group registration:', err);
-      res.status(500).json({ success: false, error: 'DB error' });
-    });
+  try {
+    const { error } = await supabase
+      .from('group_registrations')
+      .insert({
+        leader_name: data.leader.name,
+        leader_email: data.leader.email,
+        leader_phone: data.leader.phone,
+        leader_church: data.leader.church,
+        leader_country: data.leader.country,
+        accommodation: data.accommodation,
+        payment: data.payment,
+        total: data.total,
+        discount: data.discount,
+        members: data.members
+      });
+
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error saving group registration:', err);
+    res.status(500).json({ success: false, error: 'DB error' });
+  }
 });
 
 // Admin authentication middleware
@@ -144,34 +106,34 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 // Protected Admin API endpoints
-app.get('/api/admin/individuals', authenticateAdmin, (req, res) => {
-  db.query('SELECT * FROM individual_registrations ORDER BY created_at DESC')
-    .then(result => {
-      const results = result.rows;
-      // Parse JSON fields
-      results.forEach(row => {
-        try {
-          row.dayPass = JSON.parse(row.dayPass || '[]');
-        } catch { row.dayPass = []; }
-      });
-      res.json(results);
-    })
-    .catch(() => res.status(500).json([]));
+app.get('/api/admin/individuals', authenticateAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('individual_registrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Error fetching admin individuals:', err);
+    res.status(500).json([]);
+  }
 });
 
-app.get('/api/admin/groups', authenticateAdmin, (req, res) => {
-  db.query('SELECT * FROM group_registrations ORDER BY created_at DESC')
-    .then(result => {
-      const results = result.rows;
-      // Parse JSON fields
-      results.forEach(row => {
-        try {
-          row.members = JSON.parse(row.members || '[]');
-        } catch { row.members = []; }
-      });
-      res.json(results);
-    })
-    .catch(() => res.status(500).json([]));
+app.get('/api/admin/groups', authenticateAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('group_registrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Error fetching admin groups:', err);
+    res.status(500).json([]);
+  }
 });
 
 const PORT = process.env.PORT || 3000;
