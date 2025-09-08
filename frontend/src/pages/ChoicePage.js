@@ -74,6 +74,26 @@ const ChoicePage = () => {
             Individual
           </Button>
           <Button
+            variant="contained"
+            sx={{
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '14px 0',
+              fontSize: 18,
+              background: 'linear-gradient(45deg, #e91e63 30%, #9c27b0 90%)',
+              transition: 'all 0.2s',
+              '&:hover, &:focus': {
+                background: 'linear-gradient(45deg, #c2185b 30%, #7b1fa2 90%)',
+                boxShadow: '0 6px 18px rgba(233, 30, 99, 0.3)'
+              }
+            }}
+            size="large"
+            fullWidth
+            onClick={() => navigate('/register/couple')}
+          >
+            Couple
+          </Button>
+          <Button
             variant="outlined"
             color="primary"
             size="large"

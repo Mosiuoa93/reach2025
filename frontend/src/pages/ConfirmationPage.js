@@ -14,7 +14,7 @@ export default function ConfirmationPage() {
     <Container maxWidth="sm" style={{ marginTop: '3rem', textAlign: 'center' }}>
       <Typography variant="h4" gutterBottom>Registration Successful!</Typography>
       <Typography variant="body1" gutterBottom>
-        Thank you for registering for the REACH2025 Multi-Ministries Event. We have received your details.
+        Thank you for registering for the REACH2026 Multi-Ministries Event. We have received your details.
       </Typography>
       {summary && (
         <div style={{ textAlign: 'left', margin: '2rem auto', maxWidth: 600, background: '#f6f6f6', padding: 16, borderRadius: 8 }}>

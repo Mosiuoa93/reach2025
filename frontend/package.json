@@ -1,8 +1,8 @@
 {
-  "name": "reach2025-frontend",
-  "version": "1.0.0",
+  "name": "reach2026-frontend",
+  "version": "2.0.0",
   "private": true,
-  "description": "Frontend for REACH2025 Event Registration System",
+  "description": "Frontend for REACH2026 Event Registration System",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -16,6 +16,7 @@
     "@mui/material": "^5.15.0",
     "axios": "^1.6.0",
     "react": "^18.2.0",
+    "react-csv": "^2.2.2",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.0"
   },
