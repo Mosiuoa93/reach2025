@@ -5,7 +5,7 @@
   "description": "Frontend for REACH2026 Event Registration System",
   "scripts": {
     "start": "react-scripts start",
-    "build": "REACT_APP_API_URL=https://backend-old-smoke-6499.fly.dev react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
