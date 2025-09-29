@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container, Paper, Typography, TextField, Button, Grid, 
@@ -6,11 +6,26 @@ import {
   Divider, Card, CardContent, IconButton, Chip
 } from '@mui/material';
 import { Group, Person, Email, Phone, Church, Public, Hotel, Payment, Add, Delete, FamilyRestroom } from '@mui/icons-material';
+import AccommodationTooltip from '../components/AccommodationTooltip';
 
 const CoupleRegistration = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pricing, setPricing] = useState({
+    coupleBasePrice: 3000,
+    childrenCount: 0,
+    childRate: 1155,
+    childrenTotal: 0,
+    total: 3000,
+    isEarlyBird: true,
+    breakdown: {
+      adults: 2,
+      children: 0,
+      totalPeople: 2
+    }
+  });
+  const [pricingLoading, setPricingLoading] = useState(false);
   const [formData, setFormData] = useState({
     partner1: {
       name: '',
@@ -32,6 +47,59 @@ const CoupleRegistration = () => {
     specialNeeds: '',
     children: []
   });
+
+  // Fallback early bird detection
+  const isEarlyBirdPeriod = () => {
+    const now = new Date();
+    const earlyBirdDeadline = new Date('2026-02-28');
+    return now <= earlyBirdDeadline;
+  };
+
+  // Calculate couple pricing from backend
+  const calculateCouplePricing = async () => {
+    try {
+      setPricingLoading(true);
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${apiUrl}/api/pricing/calculate-couple`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ children: formData.children })
+      });
+      
+      const data = await response.json();
+      setPricing(data);
+    } catch (error) {
+      console.error('Error calculating couple price:', error);
+      // Fallback calculation
+      const isEarlyBird = isEarlyBirdPeriod();
+      const coupleBasePrice = isEarlyBird ? 3000 : 3500;
+      const childrenCount = formData.children.length;
+      const childrenTotal = childrenCount * 1155;
+      
+      setPricing({
+        coupleBasePrice,
+        childrenCount,
+        childRate: 1155,
+        childrenTotal,
+        total: coupleBasePrice + childrenTotal,
+        isEarlyBird,
+        breakdown: {
+          adults: 2,
+          children: childrenCount,
+          totalPeople: 2 + childrenCount
+        }
+      });
+    } finally {
+      setPricingLoading(false);
+    }
+  };
+
+  // Recalculate pricing when children change
+  useEffect(() => {
+    calculateCouplePricing();
+  }, [formData.children.length]);
 
   const handleInputChange = (partner, field, value) => {
     if (partner) {
@@ -74,21 +142,15 @@ const CoupleRegistration = () => {
     }));
   };
 
-  // Calculate total pricing including children
+  // Calculate total pricing using backend data
   const calculateTotal = () => {
-    let total = 2600; // Base couple price
-    
-    formData.children.forEach(child => {
-      const age = parseInt(child.age);
-      if (age >= 12 && age <= 18) {
-        total += 1300; // Half price for teens
-      } else if (age > 18) {
-        total += 2600; // Full price for adults
-      }
-      // Children under 12 are free
-    });
-    
-    return total;
+    return pricing.total;
+  };
+
+  // Get child price for display
+  const getChildPrice = (age) => {
+    if (!age) return '-';
+    return `R${pricing.childRate.toLocaleString()}`;
   };
 
   const validateForm = () => {
@@ -168,12 +230,81 @@ const CoupleRegistration = () => {
           <Typography variant="h6" color="secondary" gutterBottom>
             REACH2026 Leader's Summit
           </Typography>
+          
+          {/* Modern Early Bird Banner */}
+          {isEarlyBirdPeriod() && (
+            <Box 
+              sx={{ 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 3,
+                p: 3,
+                mb: 3,
+                textAlign: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
+              }}
+            >
+              {/* Decorative elements */}
+              <Box sx={{ 
+                position: 'absolute', 
+                top: -10, 
+                right: -10, 
+                width: 60, 
+                height: 60, 
+                borderRadius: '50%', 
+                background: 'rgba(255,255,255,0.1)' 
+              }} />
+              <Box sx={{ 
+                position: 'absolute', 
+                bottom: -20, 
+                left: -20, 
+                width: 80, 
+                height: 80, 
+                borderRadius: '50%', 
+                background: 'rgba(255,255,255,0.05)' 
+              }} />
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                <Box sx={{ 
+                  background: 'rgba(255,255,255,0.2)', 
+                  borderRadius: '50%', 
+                  p: 1.5, 
+                  mr: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Typography sx={{ fontSize: '2rem' }}>💎</Typography>
+                </Box>
+                <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+                  Early Bird Family Special
+                </Typography>
+              </Box>
+              
+              <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.95)', mb: 2, lineHeight: 1.6 }}>
+                Register before <strong>February 28, 2026</strong> and save R500!
+              </Typography>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography sx={{ color: '#f8bbd9', fontWeight: 'bold', fontSize: '1.1rem' }}>💑 Couple</Typography>
+                  <Typography sx={{ color: 'white', fontSize: '0.9rem' }}>R3000 <span style={{textDecoration: 'line-through', opacity: 0.7}}>R3500</span></Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography sx={{ color: '#81c784', fontWeight: 'bold', fontSize: '1.1rem' }}>👶 Children</Typography>
+                  <Typography sx={{ color: 'white', fontSize: '0.9rem' }}>R1155 each</Typography>
+                </Box>
+              </Box>
+            </Box>
+          )}
+          
           <Typography variant="body1" color="text.secondary">
             Registration Fee: <strong>R{calculateTotal().toLocaleString()}.00</strong>
             {formData.children.length > 0 && (
               <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>
                 Includes {formData.children.length} child{formData.children.length !== 1 ? 'ren' : ''}
-                (Under 12: Free • 12-18: R1,300 • 18+: R2,600)
+                (All children: R1,155 each)
               </Typography>
             )}
           </Typography>
@@ -345,7 +476,10 @@ const CoupleRegistration = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth required>
-                <InputLabel>Accommodation</InputLabel>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <InputLabel>Accommodation</InputLabel>
+                  <AccommodationTooltip type="couple" />
+                </Box>
                 <Select
                   value={formData.accommodation}
                   label="Accommodation"
@@ -405,7 +539,7 @@ const CoupleRegistration = () => {
                     Children Information
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Add children attending with the couple (Under 12: Free • 12-18: R1,300 • 18+: R2,600)
+                    Add children attending with the couple (All children: R1,155 each)
                   </Typography>
                 </Box>
                 <Box flexGrow={1} />
@@ -490,10 +624,7 @@ const CoupleRegistration = () => {
                           <Grid item xs={12} sm={2}>
                             <Box display="flex" alignItems="center" height="100%">
                               <Typography variant="body2" color="primary" fontWeight="bold">
-                                {child.age ? (
-                                  parseInt(child.age) < 12 ? 'Free' :
-                                  parseInt(child.age) <= 18 ? 'R1,300' : 'R2,600'
-                                ) : '-'}
+                                {child.age ? getChildPrice(child.age) : '-'}
                               </Typography>
                             </Box>
                           </Grid>
@@ -504,16 +635,57 @@ const CoupleRegistration = () => {
                 </Grid>
               )}
 
-              {formData.children.length > 0 && (
-                <Box mt={3} p={2} sx={{ background: '#e8f5e8', borderRadius: 2 }}>
-                  <Typography variant="body1" fontWeight="bold" color="success.dark">
-                    Total with Children: R{calculateTotal().toLocaleString()}.00
+              {/* Pricing Summary */}
+              <Box mt={3} p={2} sx={{ background: '#e8f5e8', borderRadius: 2 }}>
+                <Typography variant="h6" fontWeight="bold" color="success.dark" gutterBottom>
+                  Family Pricing Summary
+                  {pricing.isEarlyBird && (
+                    <Box component="span" sx={{ 
+                      ml: 1, 
+                      px: 1.5, 
+                      py: 0.5, 
+                      borderRadius: 2, 
+                      background: 'linear-gradient(45deg, #667eea, #764ba2)', 
+                      color: 'white', 
+                      fontSize: '0.75rem', 
+                      fontWeight: 'bold',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.5
+                    }}>
+                      💎 Early Bird
+                    </Box>
+                  )}
+                </Typography>
+                
+                <Typography variant="body1" gutterBottom>
+                  Couple Base Price: R{pricing.coupleBasePrice.toLocaleString()}.00
+                </Typography>
+                
+                {pricing.childrenCount > 0 && (
+                  <Typography variant="body1" gutterBottom>
+                    Children ({pricing.childrenCount}): R{pricing.childrenTotal.toLocaleString()}.00
+                    <span style={{ fontSize: '0.875rem', color: 'text.secondary', marginLeft: 8 }}>
+                      (R{pricing.childRate.toLocaleString()} each)
+                    </span>
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Base couple fee (R2,600) + {formData.children.length} child{formData.children.length !== 1 ? 'ren' : ''}
+                )}
+                
+                <Typography variant="h5" fontWeight="bold" color="primary" sx={{ mt: 1 }}>
+                  Total: R{pricing.total.toLocaleString()}.00
+                </Typography>
+                
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {pricing.breakdown.totalPeople} people total ({pricing.breakdown.adults} adults
+                  {pricing.childrenCount > 0 && ` + ${pricing.childrenCount} children`})
+                </Typography>
+                
+                {pricingLoading && (
+                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                    Calculating pricing...
                   </Typography>
-                </Box>
-              )}
+                )}
+              </Box>
             </CardContent>
           </Card>
 

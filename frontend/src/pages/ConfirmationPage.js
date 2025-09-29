@@ -67,10 +67,15 @@ export default function ConfirmationPage() {
           )}
         </div>
       )}
-      {payment === 'now' ? (
+      {/* Check for all online payment types */}
+      {(payment === 'now' || payment === 'online' || payment === 'paynow' || payment === 'eft' || payment === 'card') ? (
         <>
           <Typography variant="h6" color="secondary" gutterBottom>
             Please proceed to payment to complete your registration.
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom style={{ marginTop: 16 }}>
+            You will be redirected to Multi Ministries secure payment portal.
+            Please reference your registration details when making payment.
           </Typography>
           <Button
             variant="contained"
@@ -78,15 +83,28 @@ export default function ConfirmationPage() {
             href="https://multiministries.co.za/get-involved/#donate"
             target="_blank"
             rel="noopener"
-            style={{ marginTop: 24 }}
+            style={{ 
+              marginTop: 24, 
+              background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+              fontSize: '1.1rem',
+              padding: '12px 32px'
+            }}
           >
-            Proceed to Payment
+            🔒 Proceed to Secure Payment
           </Button>
+          <Typography variant="body2" color="text.secondary" style={{ marginTop: 16, fontStyle: 'italic' }}>
+            💡 Tip: Keep this confirmation page open until payment is complete
+          </Typography>
         </>
       ) : (
-        <Typography variant="h6" color="primary" gutterBottom style={{ marginTop: 24 }}>
-          Please remember to bring payment to the venue.
-        </Typography>
+        <>
+          <Typography variant="h6" color="primary" gutterBottom style={{ marginTop: 24 }}>
+            Please remember to bring payment to the venue.
+          </Typography>
+          <Typography variant="body2" color="text.secondary" style={{ marginTop: 16 }}>
+            Cash payments will be accepted at registration.
+          </Typography>
+        </>
       )}
       <IconButton
         onClick={() => navigate(-1)}
