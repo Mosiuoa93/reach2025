@@ -8,18 +8,35 @@ const supabase = require('./config/supabase');
 
 const app = express();
 
+// CORS: allow local dev, production domains, and Vercel previews
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://reach-summit.co.za',
+  'https://www.reach-summit.co.za'
+];
+
 app.use(cors({
-  origin: [
-    'https://www.reach-summit.co.za',
-    'http://localhost:3000'
-  ],
+  origin: (origin, callback) => {
+    // Allow non-browser requests or same-origin
+    if (!origin) return callback(null, true);
+    try {
+      const hostname = new URL(origin).hostname;
+      const isVercelPreview = hostname.endsWith('.vercel.app');
+      if (allowedOrigins.includes(origin) || isVercelPreview) {
+        return callback(null, true);
+      }
+    } catch (e) {
+      // if origin is not a valid URL, reject
+    }
+    return callback(new Error('CORS not allowed'), false);
+  },
   credentials: true
 }));
-app.use(express.json());
-app.use(helmet());
-app.use(morgan('combined'));
 
-// Comprehensive pricing service
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
+});
 class PricingService {
   static PRICES = {
     GUESTHOUSE: {
