@@ -98,7 +98,7 @@ export default function IndividualRegistration() {
   // Fetch pricing information from backend
   const fetchPricingInfo = async () => {
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
       const response = await fetch(`${apiUrl}/api/pricing/info`);
       const data = await response.json();
       setPricingInfo(data);
@@ -116,7 +116,7 @@ export default function IndividualRegistration() {
 
     try {
       setLoading(true);
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
       const response = await fetch(`${apiUrl}/api/pricing/calculate`, {
         method: 'POST',
         headers: {
@@ -190,7 +190,7 @@ export default function IndividualRegistration() {
     if (!validate()) return;
     // Submit form logic
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
       const response = await fetch(`${apiUrl}/api/register/individual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

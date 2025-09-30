@@ -34,7 +34,7 @@ export default function GroupRegistration() {
   const calculateGroupPricing = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
       const response = await fetch(`${apiUrl}/api/pricing/calculate-group`, {
         method: 'POST',
         headers: {
