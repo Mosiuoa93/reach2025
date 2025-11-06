@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, TextField, Button, IconButton, Paper, Grid, Box, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import { getApiBase } from '../utils/api';
 
 const initialMember = { name: '', gender: '', email: '', phone: '' };
 
@@ -34,7 +35,7 @@ export default function GroupRegistration() {
   const calculateGroupPricing = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
+      const apiUrl = getApiBase();
       const response = await fetch(`${apiUrl}/api/pricing/calculate-group`, {
         method: 'POST',
         headers: {
@@ -97,18 +98,18 @@ export default function GroupRegistration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Basic validation (expand as needed)
-    if (!leader.name || !leader.email) {
-      setErrors({ leader: 'Leader name and email required' });
+    if (!leader.name || !leader.email || !leader.phone || !leader.church || !leader.country) {
+      setErrors({ leader: 'Leader name, email, phone, church and country are required' });
       return;
     }
-    if (members.some(m => !m.name || !m.email)) {
-      setErrors({ members: 'All members need name and email' });
+    if (members.some(m => !m.name || !m.email || !m.phone || !m.gender)) {
+      setErrors({ members: 'All members need name, email, phone and gender' });
       return;
     }
     setErrors({});
     // Submit to backend
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const apiUrl = getApiBase();
       const response = await fetch(`${apiUrl}/api/register/group`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -137,7 +138,12 @@ export default function GroupRegistration() {
           } 
         });
       } else {
-        alert('Failed to submit group registration.');
+        try {
+          const err = await response.json();
+          alert(err.error || 'Failed to submit group registration.');
+        } catch (_) {
+          alert('Failed to submit group registration.');
+        }
       }
     } catch (err) {
       alert('Error submitting group registration.');
@@ -270,9 +276,9 @@ export default function GroupRegistration() {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}><TextField label="Email" name="email" value={leader.email} onChange={handleLeaderChange} fullWidth required /></Grid>
-            <Grid item xs={12} sm={6}><TextField label="Phone" name="phone" value={leader.phone} onChange={handleLeaderChange} fullWidth /></Grid>
-            <Grid item xs={12} sm={6}><TextField label="Church/Organization" name="church" value={leader.church} onChange={handleLeaderChange} fullWidth /></Grid>
-            <Grid item xs={12} sm={6}><TextField label="Country" name="country" value={leader.country} onChange={handleLeaderChange} fullWidth /></Grid>
+            <Grid item xs={12} sm={6}><TextField label="Phone" name="phone" value={leader.phone} onChange={handleLeaderChange} fullWidth required /></Grid>
+            <Grid item xs={12} sm={6}><TextField label="Church/Organization" name="church" value={leader.church} onChange={handleLeaderChange} fullWidth required /></Grid>
+            <Grid item xs={12} sm={6}><TextField label="Country" name="country" value={leader.country} onChange={handleLeaderChange} fullWidth required /></Grid>
           </Grid>
         </Paper>
         <Paper sx={{ p: 2, mb: 2 }}>

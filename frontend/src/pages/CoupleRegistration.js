@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { Group, Person, Email, Phone, Church, Public, Hotel, Payment, Add, Delete, FamilyRestroom } from '@mui/icons-material';
 import AccommodationTooltip from '../components/AccommodationTooltip';
+import { getApiBase } from '../utils/api';
 
 const CoupleRegistration = () => {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ const CoupleRegistration = () => {
   const calculateCouplePricing = async () => {
     try {
       setPricingLoading(true);
-      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
+      const apiUrl = getApiBase();
       const response = await fetch(`${apiUrl}/api/pricing/calculate-couple`, {
         method: 'POST',
         headers: {
@@ -184,7 +185,8 @@ const CoupleRegistration = () => {
     setError('');
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev'}/api/register/couple`, {
+      const apiUrl = getApiBase();
+      const response = await fetch(`${apiUrl}/api/register/couple`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

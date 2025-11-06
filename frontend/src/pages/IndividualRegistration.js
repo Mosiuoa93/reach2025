@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, TextField, FormControlLabel, Checkbox, Button, Radio, RadioGroup, FormControl, FormLabel, FormGroup, FormHelperText, IconButton, Paper, Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AccommodationTooltip from '../components/AccommodationTooltip';
+import { getApiBase } from '../utils/api';
 
 const days = [
   { label: 'Day 1', value: 'day1' },
@@ -98,12 +99,17 @@ export default function IndividualRegistration() {
   // Fetch pricing information from backend
   const fetchPricingInfo = async () => {
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
+      const apiUrl = getApiBase();
       const response = await fetch(`${apiUrl}/api/pricing/info`);
+      if (!response.ok) {
+        // Endpoint may not exist on current backend; gracefully skip
+        return;
+      }
       const data = await response.json();
       setPricingInfo(data);
     } catch (error) {
-      console.error('Error fetching pricing info:', error);
+      // Silent fail, fallback pricing will be used
+      console.warn('Pricing info unavailable; using fallback pricing.');
     }
   };
 
@@ -116,7 +122,7 @@ export default function IndividualRegistration() {
 
     try {
       setLoading(true);
-      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
+      const apiUrl = getApiBase();
       const response = await fetch(`${apiUrl}/api/pricing/calculate`, {
         method: 'POST',
         headers: {
@@ -129,9 +135,13 @@ export default function IndividualRegistration() {
           dayPassMeals: form.dayPassMeals
         })
       });
-      
+      if (!response.ok) {
+        // Fall back to local calculation
+        setCurrentPrice(getFallbackPrice());
+        return;
+      }
       const data = await response.json();
-      setCurrentPrice(data.total);
+      setCurrentPrice(data.total ?? getFallbackPrice());
     } catch (error) {
       console.error('Error calculating price:', error);
       setCurrentPrice(0);
@@ -190,7 +200,7 @@ export default function IndividualRegistration() {
     if (!validate()) return;
     // Submit form logic
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
+      const apiUrl = getApiBase();
       const response = await fetch(`${apiUrl}/api/register/individual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
