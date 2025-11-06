@@ -81,7 +81,7 @@ function AdminDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+        const apiUrl = process.env.REACT_APP_API_URL || 'https://backend-old-smoke-6499.fly.dev';
         console.log('🔍 Fetching data from API URL:', apiUrl);
         
         console.log('📡 Making API calls...');

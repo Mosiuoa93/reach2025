@@ -418,6 +418,21 @@ app.get('/api/admin/groups', authenticateAdmin, async (req, res) => {
   }
 });
 
+app.get('/api/admin/couples', authenticateAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('couple_registrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Error fetching admin couples:', err);
+    res.status(500).json([]);
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Backend server running on port ${PORT}`);
