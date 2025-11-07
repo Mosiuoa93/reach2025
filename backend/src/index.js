@@ -26,6 +26,7 @@ db.connect()
         name VARCHAR(100),
         email VARCHAR(100),
         phone VARCHAR(50),
+        gender VARCHAR(20),
         church VARCHAR(100),
         country VARCHAR(100),
         emergencyName VARCHAR(100),
@@ -36,6 +37,7 @@ db.connect()
         dayPass TEXT,
         payment VARCHAR(20),
         commitment VARCHAR(100),
+        isStudent BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS group_registrations (
@@ -95,14 +97,14 @@ app.post('/api/register/individual', async (req, res) => {
     // Insert registration
     await db.query(
       `INSERT INTO individual_registrations 
-        (name, email, phone, church, country, emergencyName, emergencyContact, indemnity, accommodation, bedding, dayPass, payment, commitment) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+        (name, email, phone, gender, church, country, emergencyName, emergencyContact, indemnity, accommodation, bedding, dayPass, payment, commitment, isStudent) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
       [
-        data.name, data.email, data.phone, data.church, data.country,
+        data.name, data.email, data.phone, data.gender, data.church, data.country,
         data.emergencyName, data.emergencyContact, data.indemnity,
         data.accommodation, data.bedding,
         JSON.stringify(data.dayPass || []),
-        data.payment, data.commitment
+        data.payment, data.commitment, data.isStudent || false
       ]
     );
     

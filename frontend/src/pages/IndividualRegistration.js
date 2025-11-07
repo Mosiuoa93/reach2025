@@ -107,20 +107,24 @@ export default function IndividualRegistration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    // Submit form logic
+    
     try {
       const response = await fetch('https://backend-old-smoke-6499.fly.dev/api/register/individual', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      if (response.ok) {
-        navigate('/register/confirmation', { state: { payment: form.payment, summary: form } });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        navigate('/register/confirmation', { state: { type: 'individual', payment: form.payment, summary: form } });
       } else {
-        alert('Failed to submit registration.');
+        alert(data.error || 'Registration failed. Please try again.');
       }
     } catch (error) {
-      alert('Error submitting registration.');
+      console.error('Registration error:', error);
+      alert('Network error. Please check your connection and try again.');
     }
   };
 
