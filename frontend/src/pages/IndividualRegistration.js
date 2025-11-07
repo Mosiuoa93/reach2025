@@ -39,43 +39,29 @@ export default function IndividualRegistration() {
 
   const getPricing = () => {
     const isEarlyBird = isEarlyBirdPeriod();
-    const basePrice = {
-      dorm: 1650,
-      guesthouse: 1900,
-    };
     
-    // Apply 30% early bird discount
-    const discountedPrice = isEarlyBird ? {
-      dorm: Math.round(basePrice.dorm * 0.7),
-      guesthouse: Math.round(basePrice.guesthouse * 0.7),
-    } : basePrice;
-
     return {
-      dorm: discountedPrice.dorm,
-      guesthouse: discountedPrice.guesthouse,
-      baseDorm: basePrice.dorm,
-      baseGuesthouse: basePrice.guesthouse,
+      dorm: isEarlyBird ? 1400 : 1650,        // R1650 - R250 early bird = R1400
+      guesthouse: isEarlyBird ? 1650 : 1900,  // R1900 - R250 early bird = R1650
+      student: 1155,                           // Student price (already discounted)
+      baseDorm: 1650,
+      baseGuesthouse: 1900,
       isEarlyBird,
-      discount: isEarlyBird ? 30 : 0
+      earlyBirdDiscount: 250
     };
   };
 
   const pricing = getPricing();
 
   const calculateTotal = () => {
-    let total = 0;
-    if (form.accommodation === 'dorm') {
-      total = pricing.dorm;
-    } else if (form.accommodation === 'guesthouse') {
-      total = pricing.guesthouse;
-    }
-    
-    // Apply student discount (30% off)
     if (form.isStudent && form.accommodation === 'dorm') {
-      total = Math.round(total * 0.7);
+      return pricing.student;  // R1155 for students
+    } else if (form.accommodation === 'dorm') {
+      return pricing.dorm;
+    } else if (form.accommodation === 'guesthouse') {
+      return pricing.guesthouse;
     }
-    
-    return total;
+    return 0;
   };
 
   const handleChange = (e) => {
@@ -197,7 +183,7 @@ export default function IndividualRegistration() {
             }}
           >
             <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '0.9rem', letterSpacing: '0.5px' }}>
-              💎 Early Bird Special - 30% OFF!
+              💎 Early Bird Special - Save R250!
             </Typography>
             <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem', mt: 0.5 }}>
               Dorm: R{pricing.dorm} (was R{pricing.baseDorm}) | Guest House: R{pricing.guesthouse} (was R{pricing.baseGuesthouse})
@@ -324,8 +310,8 @@ export default function IndividualRegistration() {
                 <CardContent sx={{ py: 1.5 }}>
                   <Typography color="primary" style={{ marginBottom: 8 }}>
                     Dormitory: <b>R{calculateTotal()}</b>
-                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(30% off: R{pricing.baseDorm})</span>}
-                    {form.isStudent && <span style={{ color: '#ff6f00', fontSize: '0.85rem', marginLeft: 8 }}>+ 30% student discount applied</span>}
+                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(Save R{pricing.earlyBirdDiscount}: was R{pricing.baseDorm})</span>}
+                    {form.isStudent && <span style={{ color: '#ff6f00', fontSize: '0.85rem', marginLeft: 8 }}>Student Price</span>}
                   </Typography>
                 </CardContent>
               </Card>
@@ -343,7 +329,10 @@ export default function IndividualRegistration() {
                 <CardContent sx={{ py: 1.5 }}>
                   <Typography color="primary" style={{ marginBottom: 8 }}>
                     Guest House: <b>R{pricing.guesthouse}</b>
-                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(30% off: R{pricing.baseGuesthouse})</span>}
+                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(Save R{pricing.earlyBirdDiscount}: was R{pricing.baseGuesthouse})</span>}
+                  </Typography>
+                  <Typography variant="body2" color="warning.main" sx={{ mt: 1, fontSize: '0.8rem' }}>
+                    ⚠️ Limited to 120 spaces - availability checked during registration
                   </Typography>
                 </CardContent>
               </Card>
