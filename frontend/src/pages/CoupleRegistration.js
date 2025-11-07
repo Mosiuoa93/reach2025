@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import { Group, Person, Email, Phone, Church, Public, Hotel, Payment, Add, Delete, FamilyRestroom } from '@mui/icons-material';
 import AccommodationTooltip from '../components/AccommodationTooltip';
-import { getApiBase } from '../utils/api';
 
 const CoupleRegistration = () => {
   const navigate = useNavigate();
@@ -26,7 +25,6 @@ const CoupleRegistration = () => {
       totalPeople: 2
     }
   });
-  const [pricingLoading, setPricingLoading] = useState(false);
   const [formData, setFormData] = useState({
     partner1: {
       name: '',
@@ -56,45 +54,26 @@ const CoupleRegistration = () => {
     return now <= earlyBirdDeadline;
   };
 
-  // Calculate couple pricing from backend
-  const calculateCouplePricing = async () => {
-    try {
-      setPricingLoading(true);
-      const apiUrl = getApiBase();
-      const response = await fetch(`${apiUrl}/api/pricing/calculate-couple`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ children: formData.children })
-      });
-      
-      const data = await response.json();
-      setPricing(data);
-    } catch (error) {
-      console.error('Error calculating couple price:', error);
-      // Fallback calculation
-      const isEarlyBird = isEarlyBirdPeriod();
-      const coupleBasePrice = isEarlyBird ? 3000 : 3500;
-      const childrenCount = formData.children.length;
-      const childrenTotal = childrenCount * 1155;
-      
-      setPricing({
-        coupleBasePrice,
-        childrenCount,
-        childRate: 1155,
-        childrenTotal,
-        total: coupleBasePrice + childrenTotal,
-        isEarlyBird,
-        breakdown: {
-          adults: 2,
-          children: childrenCount,
-          totalPeople: 2 + childrenCount
-        }
-      });
-    } finally {
-      setPricingLoading(false);
-    }
+  // Calculate couple pricing
+  const calculateCouplePricing = () => {
+    const isEarlyBird = isEarlyBirdPeriod();
+    const coupleBasePrice = isEarlyBird ? 3000 : 3500;
+    const childrenCount = formData.children.length;
+    const childrenTotal = childrenCount * 1155;
+    
+    setPricing({
+      coupleBasePrice,
+      childrenCount,
+      childRate: 1155,
+      childrenTotal,
+      total: coupleBasePrice + childrenTotal,
+      isEarlyBird,
+      breakdown: {
+        adults: 2,
+        children: childrenCount,
+        totalPeople: 2 + childrenCount
+      }
+    });
   };
 
   // Recalculate pricing when children change
@@ -185,7 +164,7 @@ const CoupleRegistration = () => {
     setError('');
 
     try {
-      const apiUrl = getApiBase();
+      const apiUrl = 'https://backend-old-smoke-6499.fly.dev';
       const response = await fetch(`${apiUrl}/api/register/couple`, {
         method: 'POST',
         headers: {
@@ -681,12 +660,6 @@ const CoupleRegistration = () => {
                   {pricing.breakdown.totalPeople} people total ({pricing.breakdown.adults} adults
                   {pricing.childrenCount > 0 && ` + ${pricing.childrenCount} children`})
                 </Typography>
-                
-                {pricingLoading && (
-                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                    Calculating pricing...
-                  </Typography>
-                )}
               </Box>
             </CardContent>
           </Card>
