@@ -26,6 +26,7 @@ export default function IndividualRegistration() {
     dayPass: [],
     payment: '',
     commitment: false,
+    isStudent: false,
   });
   const [errors, setErrors] = useState({});
 
@@ -38,22 +39,43 @@ export default function IndividualRegistration() {
 
   const getPricing = () => {
     const isEarlyBird = isEarlyBirdPeriod();
+    const basePrice = {
+      dorm: 1650,
+      guesthouse: 1900,
+    };
+    
+    // Apply 30% early bird discount
+    const discountedPrice = isEarlyBird ? {
+      dorm: Math.round(basePrice.dorm * 0.7),
+      guesthouse: Math.round(basePrice.guesthouse * 0.7),
+    } : basePrice;
+
     return {
-      dorm: isEarlyBird ? 1200 : 1500,
-      dayPass: isEarlyBird ? 200 : 250,
-      isEarlyBird
+      dorm: discountedPrice.dorm,
+      guesthouse: discountedPrice.guesthouse,
+      baseDorm: basePrice.dorm,
+      baseGuesthouse: basePrice.guesthouse,
+      isEarlyBird,
+      discount: isEarlyBird ? 30 : 0
     };
   };
 
   const pricing = getPricing();
 
   const calculateTotal = () => {
+    let total = 0;
     if (form.accommodation === 'dorm') {
-      return pricing.dorm;
-    } else if (form.accommodation === 'daypass') {
-      return form.dayPass.length * pricing.dayPass;
+      total = pricing.dorm;
+    } else if (form.accommodation === 'guesthouse') {
+      total = pricing.guesthouse;
     }
-    return 0;
+    
+    // Apply student discount (30% off)
+    if (form.isStudent && form.accommodation === 'dorm') {
+      total = Math.round(total * 0.7);
+    }
+    
+    return total;
   };
 
   const handleChange = (e) => {
@@ -175,9 +197,12 @@ export default function IndividualRegistration() {
             }}
           >
             <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '0.9rem', letterSpacing: '0.5px' }}>
-              💎 Early Bird Special - Save up to R300!
+              💎 Early Bird Special - 30% OFF!
             </Typography>
             <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem', mt: 0.5 }}>
+              Dorm: R{pricing.dorm} (was R{pricing.baseDorm}) | Guest House: R{pricing.guesthouse} (was R{pricing.baseGuesthouse})
+            </Typography>
+            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.8rem', mt: 0.5 }}>
               Register before February 28, 2026
             </Typography>
           </Box>
@@ -267,26 +292,40 @@ export default function IndividualRegistration() {
             label="I accept the indemnity agreement (required)"
           />
           {errors.indemnity && <FormHelperText error>{errors.indemnity}</FormHelperText>}
-          <FormControl component="fieldset" margin="normal" error={!!errors.accommodation}>
+          {/* Student Discount Option */}
+          <FormControlLabel
+            control={<Checkbox checked={form.isStudent} name="isStudent" onChange={handleChange} />}
+            label="I am a student (30% discount on dorm only)"
+            sx={{ mb: 2 }}
+          />
+
+          <FormControl component="fieldset" margin="normal" required error={!!errors.accommodation}>
             <FormLabel component="legend">Accommodation Option</FormLabel>
             <RadioGroup
-              row
               name="accommodation"
               value={form.accommodation}
               onChange={handleChange}
             >
               <FormControlLabel value="dorm" control={<Radio />} label="Dormitory" />
-              <FormControlLabel value="daypass" control={<Radio />} label="Day Pass" />
+              <FormControlLabel 
+                value="guesthouse" 
+                control={<Radio />} 
+                label="Guest House"
+                disabled={form.isStudent}
+              />
             </RadioGroup>
+            {form.isStudent && <FormHelperText>Students can only select Dormitory</FormHelperText>}
             <FormHelperText>{errors.accommodation}</FormHelperText>
           </FormControl>
+
           {form.accommodation === 'dorm' && (
             <>
               <Card sx={{ mb: 2, bgcolor: '#f0f7ff', border: '1px solid #e3f2fd' }}>
                 <CardContent sx={{ py: 1.5 }}>
                   <Typography color="primary" style={{ marginBottom: 8 }}>
-                    Dormitory Accommodation: <b>R{pricing.dorm}</b>
-                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(was R1500)</span>}
+                    Dormitory: <b>R{calculateTotal()}</b>
+                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(30% off: R{pricing.baseDorm})</span>}
+                    {form.isStudent && <span style={{ color: '#ff6f00', fontSize: '0.85rem', marginLeft: 8 }}>+ 30% student discount applied</span>}
                   </Typography>
                 </CardContent>
               </Card>
@@ -297,26 +336,18 @@ export default function IndividualRegistration() {
               {errors.bedding && <FormHelperText error>{errors.bedding}</FormHelperText>}
             </>
           )}
-          {form.accommodation === 'daypass' && (
-            <FormControl component="fieldset" margin="normal" error={!!errors.dayPass}>
-              <FormLabel component="legend">Select Day(s) <span style={{ color: '#1976d2' }}>(R{pricing.dayPass} per day {pricing.isEarlyBird && <span style={{textDecoration: 'line-through', opacity: 0.7}}>R250</span>})</span></FormLabel>
-              <FormGroup row>
-                {days.map((d) => (
-                  <FormControlLabel
-                    key={d.value}
-                    control={
-                      <Checkbox
-                        checked={form.dayPass.includes(d.value)}
-                        onChange={handleDayChange}
-                        value={d.value}
-                      />
-                    }
-                    label={d.label}
-                  />
-                ))}
-              </FormGroup>
-              <FormHelperText>{errors.dayPass}</FormHelperText>
-            </FormControl>
+
+          {form.accommodation === 'guesthouse' && (
+            <>
+              <Card sx={{ mb: 2, bgcolor: '#fff3e0', border: '1px solid #ffe0b2' }}>
+                <CardContent sx={{ py: 1.5 }}>
+                  <Typography color="primary" style={{ marginBottom: 8 }}>
+                    Guest House: <b>R{pricing.guesthouse}</b>
+                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(30% off: R{pricing.baseGuesthouse})</span>}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </>
           )}
           <FormControl component="fieldset" margin="normal" error={!!errors.payment}>
             <FormLabel component="legend">Payment Option</FormLabel>
