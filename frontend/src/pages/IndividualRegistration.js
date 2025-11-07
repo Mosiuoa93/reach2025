@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { Typography, TextField, FormControlLabel, Checkbox, Button, Radio, RadioGroup, FormControl, FormLabel, FormGroup, FormHelperText, IconButton, Paper, Box } from '@mui/material';
+import { Typography, TextField, FormControlLabel, Checkbox, Button, Radio, RadioGroup, FormControl, FormLabel, FormGroup, FormHelperText, IconButton, Paper, Box, Container, Alert, Card, CardContent, Divider } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 
 const days = [
   { label: 'Day 1', value: 'day1' },
   { label: 'Day 2', value: 'day2' },
   { label: 'Day 3', value: 'day3' }
 ];
-
-import { useNavigate } from 'react-router-dom';
 
 export default function IndividualRegistration() {
   const navigate = useNavigate();
@@ -29,6 +28,33 @@ export default function IndividualRegistration() {
     commitment: false,
   });
   const [errors, setErrors] = useState({});
+
+  // Early bird pricing
+  const isEarlyBirdPeriod = () => {
+    const now = new Date();
+    const earlyBirdDeadline = new Date('2026-02-28');
+    return now <= earlyBirdDeadline;
+  };
+
+  const getPricing = () => {
+    const isEarlyBird = isEarlyBirdPeriod();
+    return {
+      dorm: isEarlyBird ? 1200 : 1500,
+      dayPass: isEarlyBird ? 200 : 250,
+      isEarlyBird
+    };
+  };
+
+  const pricing = getPricing();
+
+  const calculateTotal = () => {
+    if (form.accommodation === 'dorm') {
+      return pricing.dorm;
+    } else if (form.accommodation === 'daypass') {
+      return form.dayPass.length * pricing.dayPass;
+    }
+    return 0;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -132,6 +158,31 @@ export default function IndividualRegistration() {
         <Typography variant="h4" fontWeight={700} color="primary" gutterBottom sx={{ mt: 2 }}>
           Individual Registration
         </Typography>
+        <Typography variant="h6" color="secondary" gutterBottom>
+          REACH2026 Leader's Summit
+        </Typography>
+
+        {/* Early Bird Banner */}
+        {pricing.isEarlyBird && (
+          <Box 
+            sx={{ 
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: 2,
+              p: 2,
+              mb: 3,
+              textAlign: 'center',
+              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
+            }}
+          >
+            <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '0.9rem', letterSpacing: '0.5px' }}>
+              💎 Early Bird Special - Save up to R300!
+            </Typography>
+            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem', mt: 0.5 }}>
+              Register before February 28, 2026
+            </Typography>
+          </Box>
+        )}
+
         <form onSubmit={handleSubmit} style={{ marginTop: 16, textAlign: 'left' }}>
   <TextField
     fullWidth
@@ -231,9 +282,14 @@ export default function IndividualRegistration() {
           </FormControl>
           {form.accommodation === 'dorm' && (
             <>
-              <Typography color="secondary" style={{ marginBottom: 8 }}>
-                Dormitory: <b>R1300-00</b> total
-              </Typography>
+              <Card sx={{ mb: 2, bgcolor: '#f0f7ff', border: '1px solid #e3f2fd' }}>
+                <CardContent sx={{ py: 1.5 }}>
+                  <Typography color="primary" style={{ marginBottom: 8 }}>
+                    Dormitory Accommodation: <b>R{pricing.dorm}</b>
+                    {pricing.isEarlyBird && <span style={{ color: '#9c27b0', fontSize: '0.85rem', marginLeft: 8 }}>(was R1500)</span>}
+                  </Typography>
+                </CardContent>
+              </Card>
               <FormControlLabel
                 control={<Checkbox checked={form.bedding} name="bedding" onChange={handleChange} />}
                 label="I will bring my own bedding (required)"
@@ -243,7 +299,7 @@ export default function IndividualRegistration() {
           )}
           {form.accommodation === 'daypass' && (
             <FormControl component="fieldset" margin="normal" error={!!errors.dayPass}>
-              <FormLabel component="legend">Select Day(s) <span style={{ color: '#1976d2' }}>(R250-00 per day)</span></FormLabel>
+              <FormLabel component="legend">Select Day(s) <span style={{ color: '#1976d2' }}>(R{pricing.dayPass} per day {pricing.isEarlyBird && <span style={{textDecoration: 'line-through', opacity: 0.7}}>R250</span>})</span></FormLabel>
               <FormGroup row>
                 {days.map((d) => (
                   <FormControlLabel
@@ -302,7 +358,7 @@ export default function IndividualRegistration() {
               }
             }}
           >
-            Submit Registration
+            {form.accommodation ? `Register - R${calculateTotal()}` : 'Submit Registration'}
           </Button>
         </form>
       </Paper>
