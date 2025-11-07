@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button, Typography, Paper, Box } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import EventIcon from '@mui/icons-material/Event';
@@ -7,34 +7,6 @@ import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [showAdminButton, setShowAdminButton] = useState(false);
-  const [clickCount, setClickCount] = useState(0);
-  const [clickTimer, setClickTimer] = useState(null);
-  
-  // Secret access: Triple-click on the logo
-  const handleLogoClick = () => {
-    const newClickCount = clickCount + 1;
-    setClickCount(newClickCount);
-    
-    // Clear existing timer
-    if (clickTimer) {
-      clearTimeout(clickTimer);
-    }
-    
-    // If triple-clicked, show admin button
-    if (newClickCount === 3) {
-      setShowAdminButton(true);
-      setClickCount(0);
-      // Auto-hide after 30 seconds for security
-      setTimeout(() => setShowAdminButton(false), 30000);
-    } else {
-      // Reset click count after 2 seconds if not triple-clicked
-      const timer = setTimeout(() => {
-        setClickCount(0);
-      }, 2000);
-      setClickTimer(timer);
-    }
-  };
   return (
     <Box
       sx={{
@@ -49,29 +21,25 @@ const LandingPage = () => {
         position: 'relative',
       }}
     >
-      {showAdminButton && (
-        <Button
-          variant="outlined"
-          color="secondary"
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 2,
-            transition: 'all 0.2s',
-            animation: 'fadeIn 0.5s',
-            '&:hover, &:focus': {
-              background: '#ede7f6',
-              color: '#512da8',
-              boxShadow: '0 4px 16px rgba(76, 0, 130, 0.12)'
-            }
-          }}
-          // Navigate to admin login page
-          onClick={() => navigate('/admin/login')}
-        >
-          Admin
-        </Button>
-      )}
+      <Button
+        variant="outlined"
+        color="secondary"
+        sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          zIndex: 2,
+          transition: 'all 0.2s',
+          '&:hover, &:focus': {
+            background: '#ede7f6',
+            color: '#512da8',
+            boxShadow: '0 4px 16px rgba(76, 0, 130, 0.12)'
+          }
+        }}
+        onClick={() => navigate('/admin')}
+      >
+        Admin
+      </Button>
       <Paper
         elevation={6}
         sx={{
@@ -88,26 +56,9 @@ const LandingPage = () => {
         }}
       >
         <Box sx={{ height: 8, width: '100%', background: 'linear-gradient(90deg, #1976d2 0%, #9c27b0 100%)', borderRadius: '8px 8px 0 0', position: 'absolute', top: 0, left: 0 }} />
-        <img 
-          src="/logo.png" 
-          alt="Multi Ministries Logo" 
-          onClick={handleLogoClick}
-          style={{ 
-            width: 250, 
-            marginBottom: 24, 
-            display: 'block', 
-            marginLeft: 'auto', 
-            marginRight: 'auto',
-            cursor: 'pointer',
-            userSelect: 'none',
-            transition: 'transform 0.1s'
-          }} 
-          onMouseDown={(e) => e.target.style.transform = 'scale(0.98)'}
-          onMouseUp={(e) => e.target.style.transform = 'scale(1)'}
-          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-        />
+        <img src="/logo.png" alt="Multi Ministries Logo" style={{ width: 250, marginBottom: 24, display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
         <Typography variant="h4" align="center" fontWeight={700} color="primary" gutterBottom sx={{ mt: 2 }}>
-          REACH2026 Leader's Summit
+          REACH Leader's Summit
         </Typography>
         <Typography variant="body1" align="center" sx={{ mb: 3, color: '#444' }}>
           Welcome to official registration portal for Multi Ministries Event
@@ -115,7 +66,7 @@ const LandingPage = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
           <EventIcon color="secondary" sx={{ mr: 1 }} />
           <Typography variant="body1" fontWeight={600} color="#9c27b0">
-            31 August - 3 September 2026
+            25 - 28 August 2025
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>

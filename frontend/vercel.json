@@ -5,6 +5,11 @@
   "env": {
     "REACT_APP_API_URL": "https://backend-old-smoke-6499.fly.dev"
   },
+  "build": {
+    "env": {
+      "REACT_APP_API_URL": "https://backend-old-smoke-6499.fly.dev"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",

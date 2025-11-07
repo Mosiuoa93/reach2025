@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Typography, TextField, Button, IconButton, Paper, Grid, Box, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
-import { getApiBase } from '../utils/api';
 
 const initialMember = { name: '', gender: '', email: '', phone: '' };
 
@@ -13,74 +12,16 @@ export default function GroupRegistration() {
   const [accommodation, setAccommodation] = useState('dorm');
   const [payment, setPayment] = useState('paynow');
   const [errors, setErrors] = useState({});
-  const [pricing, setPricing] = useState({
-    totalPeople: 1,
-    basePrice: 1400,
-    subtotal: 1400,
-    discountPercentage: 0,
-    discount: 0,
-    total: 1400,
-    isEarlyBird: true
-  });
-  const [loading, setLoading] = useState(false);
 
-  // Fallback early bird detection
-  const isEarlyBirdPeriod = () => {
-    const now = new Date();
-    const earlyBirdDeadline = new Date('2026-02-28');
-    return now <= earlyBirdDeadline;
-  };
-
-  // Calculate group pricing from backend
-  const calculateGroupPricing = async () => {
-    try {
-      setLoading(true);
-      const apiUrl = getApiBase();
-      const response = await fetch(`${apiUrl}/api/pricing/calculate-group`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ members })
-      });
-      
-      const data = await response.json();
-      setPricing(data);
-    } catch (error) {
-      console.error('Error calculating group price:', error);
-      // Fallback calculation
-      const totalPeople = 1 + members.length;
-      const basePrice = isEarlyBirdPeriod() ? 1400 : 1650;
-      const subtotal = totalPeople * basePrice;
-      let discountPercentage = 0;
-      let discount = 0;
-      
-      if (totalPeople >= 21) {
-        discountPercentage = 20;
-        discount = subtotal * 0.20;
-      } else if (totalPeople >= 11) {
-        discountPercentage = 10;
-        discount = subtotal * 0.10;
-      }
-      
-      setPricing({
-        totalPeople,
-        basePrice,
-        subtotal,
-        discountPercentage,
-        discount,
-        total: subtotal - discount,
-        isEarlyBird: isEarlyBirdPeriod()
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Recalculate pricing when members change
-  useEffect(() => {
-    calculateGroupPricing();
-  }, [members.length]);
+  // Pricing logic
+  const memberCount = members.length;
+  const pricePerMember = accommodation === 'dorm' ? 1300 : 250 * 3; // Assume 3 days for day pass
+  let total = memberCount * pricePerMember;
+  let discount = 0;
+  if (memberCount > 10) {
+    discount = total * 0.1;
+    total = total - discount;
+  }
 
   const handleLeaderChange = (e) => {
     setLeader({ ...leader, [e.target.name]: e.target.value });
@@ -98,52 +39,26 @@ export default function GroupRegistration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Basic validation (expand as needed)
-    if (!leader.name || !leader.email || !leader.phone || !leader.church || !leader.country) {
-      setErrors({ leader: 'Leader name, email, phone, church and country are required' });
+    if (!leader.name || !leader.email) {
+      setErrors({ leader: 'Leader name and email required' });
       return;
     }
-    if (members.some(m => !m.name || !m.email || !m.phone || !m.gender)) {
-      setErrors({ members: 'All members need name, email, phone and gender' });
+    if (members.some(m => !m.name || !m.email)) {
+      setErrors({ members: 'All members need name and email' });
       return;
     }
     setErrors({});
     // Submit to backend
     try {
-      const apiUrl = getApiBase();
-      const response = await fetch(`${apiUrl}/api/register/group`, {
+      const response = await fetch('https://backend-old-smoke-6499.fly.dev/api/register/group', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          leader, 
-          members, 
-          accommodation, 
-          payment,
-          // Pricing is now calculated in backend
-        }),
+        body: JSON.stringify({ leader, members, accommodation, payment, total, discount }),
       });
       if (response.ok) {
-        navigate('/register/confirmation', { 
-          state: { 
-            payment, 
-            summary: { 
-              leader, 
-              members, 
-              accommodation, 
-              payment, 
-              total: pricing.total, 
-              discount: pricing.discount,
-              totalPeople: pricing.totalPeople,
-              discountPercentage: pricing.discountPercentage
-            } 
-          } 
-        });
+        navigate('/register/confirmation', { state: { payment, summary: { leader, members, accommodation, payment, total, discount } } });
       } else {
-        try {
-          const err = await response.json();
-          alert(err.error || 'Failed to submit group registration.');
-        } catch (_) {
-          alert('Failed to submit group registration.');
-        }
+        alert('Failed to submit group registration.');
       }
     } catch (err) {
       alert('Error submitting group registration.');
@@ -192,75 +107,6 @@ export default function GroupRegistration() {
         <Typography variant="h4" fontWeight={700} color="primary" gutterBottom sx={{ mt: 2 }}>
           Group Registration
         </Typography>
-        
-        {/* Modern Early Bird Banner */}
-        {isEarlyBirdPeriod() && (
-          <Box 
-            sx={{ 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: 3,
-              p: 3,
-              mb: 3,
-              textAlign: 'center',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
-            }}
-          >
-            {/* Decorative elements */}
-            <Box sx={{ 
-              position: 'absolute', 
-              top: -10, 
-              right: -10, 
-              width: 60, 
-              height: 60, 
-              borderRadius: '50%', 
-              background: 'rgba(255,255,255,0.1)' 
-            }} />
-            <Box sx={{ 
-              position: 'absolute', 
-              bottom: -20, 
-              left: -20, 
-              width: 80, 
-              height: 80, 
-              borderRadius: '50%', 
-              background: 'rgba(255,255,255,0.05)' 
-            }} />
-            
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <Box sx={{ 
-                background: 'rgba(255,255,255,0.2)', 
-                borderRadius: '50%', 
-                p: 1.5, 
-                mr: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Typography sx={{ fontSize: '2rem' }}>🚀</Typography>
-              </Box>
-              <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', letterSpacing: '0.5px' }}>
-                Early Bird Group Special
-              </Typography>
-            </Box>
-            
-            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.95)', mb: 2, lineHeight: 1.6 }}>
-              Register before <strong>February 28, 2026</strong> and save R250 per person!
-            </Typography>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ color: '#4fc3f7', fontWeight: 'bold', fontSize: '1.1rem' }}>👥 Per Person</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.9rem' }}>R1400 <span style={{textDecoration: 'line-through', opacity: 0.7}}>R1650</span></Typography>
-              </Box>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ color: '#ffb74d', fontWeight: 'bold', fontSize: '1.1rem' }}>🎆 Group Discounts</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.9rem' }}>10% (11+) • 20% (21+)</Typography>
-              </Box>
-            </Box>
-          </Box>
-        )}
-        
         <form onSubmit={handleSubmit} style={{ marginTop: 16, textAlign: 'left' }}>
         <Paper sx={{ p: 2, mb: 2 }}>
           <Typography variant="h6">Group Leader Information</Typography>
@@ -276,9 +122,9 @@ export default function GroupRegistration() {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}><TextField label="Email" name="email" value={leader.email} onChange={handleLeaderChange} fullWidth required /></Grid>
-            <Grid item xs={12} sm={6}><TextField label="Phone" name="phone" value={leader.phone} onChange={handleLeaderChange} fullWidth required /></Grid>
-            <Grid item xs={12} sm={6}><TextField label="Church/Organization" name="church" value={leader.church} onChange={handleLeaderChange} fullWidth required /></Grid>
-            <Grid item xs={12} sm={6}><TextField label="Country" name="country" value={leader.country} onChange={handleLeaderChange} fullWidth required /></Grid>
+            <Grid item xs={12} sm={6}><TextField label="Phone" name="phone" value={leader.phone} onChange={handleLeaderChange} fullWidth /></Grid>
+            <Grid item xs={12} sm={6}><TextField label="Church/Organization" name="church" value={leader.church} onChange={handleLeaderChange} fullWidth /></Grid>
+            <Grid item xs={12} sm={6}><TextField label="Country" name="country" value={leader.country} onChange={handleLeaderChange} fullWidth /></Grid>
           </Grid>
         </Paper>
         <Paper sx={{ p: 2, mb: 2 }}>
@@ -314,66 +160,10 @@ export default function GroupRegistration() {
           <Button variant={payment==='venue'?'contained':'outlined'} onClick={() => setPayment('venue')} style={{ marginLeft: 8 }}>Pay at Venue</Button>
         </Paper>
         <Paper sx={{ p: 2, mb: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Group Pricing Summary
-            {pricing.isEarlyBird && (
-              <Box component="span" sx={{ 
-                ml: 1, 
-                px: 1.5, 
-                py: 0.5, 
-                borderRadius: 2, 
-                background: 'linear-gradient(45deg, #667eea, #764ba2)', 
-                color: 'white', 
-                fontSize: '0.75rem', 
-                fontWeight: 'bold',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5
-              }}>
-                🚀 Early Bird
-              </Box>
-            )}
-          </Typography>
-          
-          <Typography variant="body1" color="textSecondary" gutterBottom>
-            Total People: {pricing.totalPeople} (1 leader + {members.length} members)
-          </Typography>
-          
-          <Typography variant="body1" gutterBottom>
-            Base Price: R{pricing.basePrice} per person
-          </Typography>
-          
-          <Typography variant="body1" gutterBottom>
-            Subtotal: R{pricing.subtotal.toFixed(2)}
-          </Typography>
-          
-          {pricing.discountPercentage > 0 && (
-            <Typography color="primary" variant="body1" gutterBottom>
-              Group Discount ({pricing.discountPercentage}%): -R{pricing.discount.toFixed(2)}
-              {pricing.discountPercentage === 10 && (
-                <span style={{ fontSize: '0.75rem', display: 'block' }}>Groups of 11+ people</span>
-              )}
-              {pricing.discountPercentage === 20 && (
-                <span style={{ fontSize: '0.75rem', display: 'block' }}>Groups of 21+ people</span>
-              )}
-            </Typography>
-          )}
-          
-          {pricing.discountPercentage === 0 && pricing.totalPeople >= 8 && (
-            <Typography color="textSecondary" variant="body2" gutterBottom>
-              💡 Add {11 - pricing.totalPeople} more people for 10% group discount!
-            </Typography>
-          )}
-          
-          <Typography variant="h5" color="primary" sx={{ fontWeight: 'bold', mt: 1 }}>
-            Total: R{pricing.total.toFixed(2)}
-          </Typography>
-          
-          {loading && (
-            <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-              Calculating pricing...
-            </Typography>
-          )}
+          <Typography variant="h6">Total</Typography>
+          <Typography variant="body1">Members: {memberCount}</Typography>
+          {discount > 0 && <Typography color="primary">Discount applied: -R{discount.toFixed(2)}</Typography>}
+          <Typography variant="h5">Total: R{total.toFixed(2)}</Typography>
         </Paper>
         <Button
           type="submit"

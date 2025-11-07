@@ -1,11 +1,10 @@
 [build]
-  publish = "build"
   command = "npm run build"
+  publish = "build"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[dev]
+  command = "npm start"
+  targetPort = 3000
 
-[build.environment]
-  NODE_VERSION = "20"
+[context.production.environment]
+  NODE_ENV = "production"
