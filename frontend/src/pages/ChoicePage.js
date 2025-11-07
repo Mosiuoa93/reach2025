@@ -96,6 +96,29 @@ const ChoicePage = () => {
           >
             Group
           </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="large"
+            fullWidth
+            sx={{
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '14px 0',
+              fontSize: 18,
+              borderWidth: 2,
+              transition: 'all 0.2s',
+              '&:hover, &:focus': {
+                background: '#f3e5f5',
+                color: '#c2185b',
+                borderColor: '#c2185b',
+                boxShadow: '0 4px 16px rgba(193, 24, 91, 0.12)'
+              }
+            }}
+            onClick={() => navigate('/register/couple')}
+          >
+            Couple / Family
+          </Button>
         </Stack>
       </Paper>
       <style>{`
