@@ -66,8 +66,8 @@ const LandingPage = () => {
               boxShadow: '0 4px 16px rgba(76, 0, 130, 0.12)'
             }
           }}
-          // Simple admin access - no password needed
-          onClick={() => navigate('/admin')}
+          // Navigate to admin login page
+          onClick={() => navigate('/admin/login')}
         >
           Admin
         </Button>

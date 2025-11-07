@@ -68,8 +68,8 @@ const CheckinDashboard = () => {
   const fetchRegistrations = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/checkin/registrations`);
+      const apiUrl = 'https://backend-old-smoke-6499.fly.dev';
+      const response = await fetch(`${apiUrl}/api/checkin/registrations?t=${Date.now()}`);
       const result = await response.json();
       
       if (result.success) {
@@ -144,7 +144,7 @@ const CheckinDashboard = () => {
   const handleCheckin = async (registration) => {
     try {
       setCheckinLoading(registration.id);
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const apiUrl = 'https://backend-old-smoke-6499.fly.dev';
       const endpoint = registration.type === 'individual' 
         ? `${apiUrl}/api/checkin/individual/${registration.id}`
         : registration.type === 'couple'
@@ -201,7 +201,7 @@ const CheckinDashboard = () => {
   const handleUndoCheckin = async (registration) => {
     try {
       setCheckinLoading(registration.id);
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const apiUrl = 'https://backend-old-smoke-6499.fly.dev';
       const response = await fetch(
         `${apiUrl}/api/checkin/undo/${registration.type}/${registration.id}`,
         { method: 'POST' }

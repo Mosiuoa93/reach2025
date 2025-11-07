@@ -9,11 +9,8 @@ import ConfirmationPage from './pages/ConfirmationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import CheckinDashboard from './pages/CheckinDashboard';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import Footer from './components/Footer';
-function ProtectedAdminRoute() {
-  // TEMPORARY BYPASS: Always allow access for local testing
-  return <AdminDashboard />;
-}
 
 function App() {
   return (
@@ -27,13 +24,8 @@ function App() {
         <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<ProtectedAdminRoute />} />
-        <Route path="/checkin" element={<CheckinDashboard />} />
-        <Route path="/register" element={<ChoicePage />} />
-        <Route path="/register/individual" element={<IndividualRegistration />} />
-        <Route path="/register/group" element={<GroupRegistration />} />
-        <Route path="/register/confirmation" element={<ConfirmationPage />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedAdminRoute />} />
+        <Route path="/checkin" element={<CheckinDashboard />} />
       </Routes>
       <Footer />
     </Router>
