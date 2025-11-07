@@ -1,3 +1,4 @@
+// Force rebuild - timestamp: 2025-11-07T15:31:08Z
 import React from 'react';
 import { Button, Typography, Paper, Box } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
