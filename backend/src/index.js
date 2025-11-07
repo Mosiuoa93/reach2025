@@ -63,8 +63,10 @@ db.connect()
   });
 app.use(cors({
   origin: [
+    'https://reach-summit.co.za',
     'https://www.reach-summit.co.za',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://localhost:3001'
   ],
   credentials: true
 }));
