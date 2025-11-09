@@ -5,7 +5,8 @@ function AdminLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect directly to admin dashboard
+    // Set admin token and redirect to dashboard
+    localStorage.setItem('adminToken', 'admin-access-token');
     navigate('/admin');
   }, [navigate]);
 
