@@ -1,13 +1,28 @@
 // Force rebuild - timestamp: 2025-11-07T15:31:08Z
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Typography, Paper, Box } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import EventIcon from '@mui/icons-material/Event';
 import PlaceIcon from '@mui/icons-material/Place';
+import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [logoClicks, setLogoClicks] = useState(0);
+  const [showAdminButton, setShowAdminButton] = useState(false);
+
+  const handleLogoClick = () => {
+    const newClicks = logoClicks + 1;
+    setLogoClicks(newClicks);
+    
+    if (newClicks === 3) {
+      setShowAdminButton(true);
+      setLogoClicks(0); // Reset counter
+      // Auto-hide after 10 seconds
+      setTimeout(() => setShowAdminButton(false), 10000);
+    }
+  };
   return (
     <Box
       sx={{
@@ -22,25 +37,36 @@ const LandingPage = () => {
         position: 'relative',
       }}
     >
-      <Button
-        variant="outlined"
-        color="secondary"
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 2,
-          transition: 'all 0.2s',
-          '&:hover, &:focus': {
-            background: '#ede7f6',
-            color: '#512da8',
-            boxShadow: '0 4px 16px rgba(76, 0, 130, 0.12)'
-          }
-        }}
-        onClick={() => navigate('/admin')}
-      >
-        Admin
-      </Button>
+      {showAdminButton && (
+        <Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          startIcon={<LockIcon />}
+          sx={{
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            zIndex: 2,
+            transition: 'all 0.3s ease-in-out',
+            fontWeight: 600,
+            borderRadius: 3,
+            px: 2.5,
+            py: 1,
+            background: 'linear-gradient(135deg, #9c27b0 0%, #c2185b 100%)',
+            boxShadow: '0 4px 12px rgba(156, 39, 176, 0.3)',
+            animation: 'slideIn 0.3s ease-out',
+            '&:hover, &:focus': {
+              background: 'linear-gradient(135deg, #7b1fa2 0%, #ad1457 100%)',
+              boxShadow: '0 6px 20px rgba(156, 39, 176, 0.5)',
+              transform: 'translateY(-2px)'
+            }
+          }}
+          onClick={() => navigate('/admin/login')}
+        >
+          Admin Portal
+        </Button>
+      )}
       <Paper
         elevation={6}
         sx={{
@@ -57,7 +83,23 @@ const LandingPage = () => {
         }}
       >
         <Box sx={{ height: 8, width: '100%', background: 'linear-gradient(90deg, #1976d2 0%, #9c27b0 100%)', borderRadius: '8px 8px 0 0', position: 'absolute', top: 0, left: 0 }} />
-        <img src="/logo.png" alt="Multi Ministries Logo" style={{ width: 250, marginBottom: 24, display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
+        <img 
+          src="/logo.png" 
+          alt="Multi Ministries Logo" 
+          onClick={handleLogoClick}
+          style={{ 
+            width: 250, 
+            marginBottom: 24, 
+            display: 'block', 
+            marginLeft: 'auto', 
+            marginRight: 'auto',
+            cursor: 'pointer',
+            transition: 'transform 0.2s',
+            userSelect: 'none'
+          }}
+          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+        />
         <Typography variant="h4" align="center" fontWeight={700} color="primary" gutterBottom sx={{ mt: 2 }}>
           REACH Leader's Summit
         </Typography>
@@ -136,6 +178,16 @@ const LandingPage = () => {
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(40px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+          from { 
+            opacity: 0; 
+            transform: translateX(100px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: translateX(0); 
+          }
         }
       `}</style>
     </Box>
