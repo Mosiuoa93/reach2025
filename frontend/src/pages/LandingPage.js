@@ -62,7 +62,7 @@ const LandingPage = () => {
               transform: 'translateY(-2px)'
             }
           }}
-          onClick={() => navigate('/admin/login')}
+          onClick={() => navigate('/admin')}
         >
           Admin Portal
         </Button>
