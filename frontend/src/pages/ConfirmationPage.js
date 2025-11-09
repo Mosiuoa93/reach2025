@@ -43,6 +43,31 @@ export default function ConfirmationPage() {
               )}
               <Typography variant="h6" gutterBottom><b>Total:</b> R{summary.total.toFixed(2)}</Typography>
             </>
+          ) : summary.partner1 ? (
+            // Couple Registration Summary
+            <>
+              <Typography variant="subtitle1" gutterBottom><b>Partner 1:</b></Typography>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                <li><b>Name:</b> {summary.partner1}</li>
+              </ul>
+              <Typography variant="subtitle1" gutterBottom><b>Partner 2:</b></Typography>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                <li><b>Name:</b> {summary.partner2}</li>
+              </ul>
+              <Typography variant="subtitle1" gutterBottom><b>Church/Organization:</b> {summary.church}</Typography>
+              <Typography variant="subtitle1" gutterBottom><b>Accommodation:</b> {summary.accommodation}</Typography>
+              {summary.children && summary.children.length > 0 && (
+                <>
+                  <Typography variant="subtitle1" gutterBottom><b>Children ({summary.children.length}):</b></Typography>
+                  <ul style={{ listStyle: 'none', padding: 0 }}>
+                    {summary.children.map((c, i) => (
+                      <li key={i}>{i + 1}. {c.name} ({c.age} years old)</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              <Typography variant="h6" gutterBottom><b>Total:</b> {summary.total}</Typography>
+            </>
           ) : (
             // Individual Registration Summary
             <>
@@ -67,7 +92,7 @@ export default function ConfirmationPage() {
           )}
         </div>
       )}
-      {payment === 'now' ? (
+      {payment === 'online' || payment === 'eft' || payment === 'card' ? (
         <>
           <Typography variant="h6" color="secondary" gutterBottom>
             Please proceed to payment to complete your registration.

@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 
 const app = express();
@@ -52,6 +51,26 @@ db.connect()
         total DECIMAL(10,2),
         discount DECIMAL(10,2),
         members TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE TABLE IF NOT EXISTS couple_registrations (
+        id SERIAL PRIMARY KEY,
+        partner1_name VARCHAR(100),
+        partner1_email VARCHAR(100),
+        partner1_phone VARCHAR(50),
+        partner1_gender VARCHAR(20),
+        partner2_name VARCHAR(100),
+        partner2_email VARCHAR(100),
+        partner2_phone VARCHAR(50),
+        partner2_gender VARCHAR(20),
+        church VARCHAR(100),
+        country VARCHAR(100),
+        accommodation VARCHAR(20),
+        payment VARCHAR(20),
+        children TEXT,
+        dietary_requirements TEXT,
+        special_needs TEXT,
+        total DECIMAL(10,2),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `)
@@ -143,6 +162,41 @@ app.post('/api/register/group', (req, res) => {
     });
 });
 
+// Couple registration endpoint
+app.post('/api/register/couple', async (req, res) => {
+  const data = req.body;
+
+  try {
+    // Validate required fields
+    if (!data.partner1 || !data.partner2 || !data.church || !data.country) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+
+    // Insert couple registration
+    await db.query(
+      `INSERT INTO couple_registrations 
+        (partner1_name, partner1_email, partner1_phone, partner1_gender, 
+         partner2_name, partner2_email, partner2_phone, partner2_gender,
+         church, country, accommodation, payment, children, dietary_requirements, special_needs, total) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+      [
+        data.partner1.name, data.partner1.email, data.partner1.phone, data.partner1.gender,
+        data.partner2.name, data.partner2.email, data.partner2.phone, data.partner2.gender,
+        data.church, data.country, data.accommodation, data.payment,
+        JSON.stringify(data.children || []),
+        data.dietaryRequirements || '',
+        data.specialNeeds || '',
+        data.total || 0
+      ]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error saving couple registration:', err);
+    res.status(500).json({ success: false, error: 'Registration failed. Please try again.' });
+  }
+});
+
 // Admin authentication middleware
 function authenticateAdmin(req, res, next) {
   const auth = req.headers['authorization'];
@@ -191,6 +245,21 @@ app.get('/api/admin/groups', authenticateAdmin, (req, res) => {
         try {
           row.members = JSON.parse(row.members || '[]');
         } catch { row.members = []; }
+      });
+      res.json(results);
+    })
+    .catch(() => res.status(500).json([]));
+});
+
+app.get('/api/admin/couples', authenticateAdmin, (req, res) => {
+  db.query('SELECT * FROM couple_registrations ORDER BY created_at DESC')
+    .then(result => {
+      const results = result.rows;
+      // Parse JSON fields
+      results.forEach(row => {
+        try {
+          row.children = JSON.parse(row.children || '[]');
+        } catch { row.children = []; }
       });
       res.json(results);
     })

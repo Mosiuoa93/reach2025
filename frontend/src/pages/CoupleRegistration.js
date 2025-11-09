@@ -176,9 +176,10 @@ const CoupleRegistration = () => {
       const result = await response.json();
 
       if (result.success) {
-        navigate('/confirmation', { 
+        navigate('/register/confirmation', { 
           state: { 
             type: 'couple',
+            payment: formData.payment,
             summary: {
               partner1: formData.partner1.name,
               partner2: formData.partner2.name,
@@ -669,7 +670,7 @@ const CoupleRegistration = () => {
             <Button
               variant="outlined"
               size="large"
-              onClick={() => navigate('/choice')}
+              onClick={() => navigate('/register')}
               sx={{ minWidth: 120 }}
             >
               Back
